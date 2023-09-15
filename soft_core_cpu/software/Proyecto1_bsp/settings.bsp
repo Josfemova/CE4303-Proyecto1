@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Sep 14, 2023 6:22:03 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1694737323206</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>Sep 15, 2023 5:11:30 AM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1694776290620</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>/home/josfemova/REPOSITORIOS/CE4303-Proyecto1/soft_core_cpu/software/Proyecto1_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>../../platform.sopcinfo</SopcDesignFile>
@@ -905,40 +905,40 @@
                 <attributes>memory</attributes>
         </MemoryMap>
         <MemoryMap>
-                <slaveDescriptor>onchip_mem</slaveDescriptor>
-                <addressRange>0x04010000 - 0x0401FFFF</addressRange>
-                <addressSpan>65536</addressSpan>
-                <attributes>memory</attributes>
-        </MemoryMap>
-        <MemoryMap>
                 <slaveDescriptor>pio_7seg</slaveDescriptor>
-                <addressRange>0x04021000 - 0x0402101F</addressRange>
+                <addressRange>0x04000000 - 0x0400001F</addressRange>
                 <addressSpan>32</addressSpan>
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
                 <slaveDescriptor>timer_0_ms</slaveDescriptor>
-                <addressRange>0x04021020 - 0x0402103F</addressRange>
+                <addressRange>0x04000020 - 0x0400003F</addressRange>
                 <addressSpan>32</addressSpan>
                 <attributes>timer</attributes>
         </MemoryMap>
         <MemoryMap>
                 <slaveDescriptor>pio_sw</slaveDescriptor>
-                <addressRange>0x04021040 - 0x0402104F</addressRange>
+                <addressRange>0x04000040 - 0x0400004F</addressRange>
                 <addressSpan>16</addressSpan>
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
                 <slaveDescriptor>pio_btn</slaveDescriptor>
-                <addressRange>0x04021050 - 0x0402105F</addressRange>
+                <addressRange>0x04000050 - 0x0400005F</addressRange>
                 <addressSpan>16</addressSpan>
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
                 <slaveDescriptor>jtag_uart_0</slaveDescriptor>
-                <addressRange>0x04021060 - 0x04021067</addressRange>
+                <addressRange>0x04000060 - 0x04000067</addressRange>
                 <addressSpan>8</addressSpan>
                 <attributes>printable</attributes>
+        </MemoryMap>
+        <MemoryMap>
+                <slaveDescriptor>onchip_mem</slaveDescriptor>
+                <addressRange>0x04020000 - 0x0402FFFF</addressRange>
+                <addressSpan>65536</addressSpan>
+                <attributes>memory</attributes>
         </MemoryMap>
         <LinkerSection>
                 <sectionName>.text</sectionName>

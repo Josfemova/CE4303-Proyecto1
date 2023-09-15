@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_tec' in SOPC Builder design 'platform'
  * SOPC Builder design path: ../../platform.sopcinfo
  *
- * Generated: Thu Sep 14 18:22:03 CST 2023
+ * Generated: Fri Sep 15 01:12:37 CST 2023
  */
 
 /*
@@ -51,13 +51,13 @@
 MEMORY
 {
     sdram : ORIGIN = 0x0, LENGTH = 67108864
-    reset : ORIGIN = 0x4010000, LENGTH = 32
-    onchip_mem : ORIGIN = 0x4010020, LENGTH = 65504
+    reset : ORIGIN = 0x4020000, LENGTH = 32
+    onchip_mem : ORIGIN = 0x4020020, LENGTH = 65504
 }
 
 /* Define symbols for each memory base-address */
 __alt_mem_sdram = 0x0;
-__alt_mem_onchip_mem = 0x4010000;
+__alt_mem_onchip_mem = 0x4020000;
 
 OUTPUT_FORMAT( "elf32-littlenios2",
                "elf32-littlenios2",

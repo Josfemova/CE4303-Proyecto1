@@ -29,7 +29,7 @@ module CE4303_Proyecto1(
 );
 
 logic [23:0] pio_7_seg;
-
+//assign dram_clk = clk_50;
 platform instancia_nios(
 		.clk_clk(clk_50),          //        clk.clk
 		.pio_7seg_export(pio_7_seg),  //   pio_7seg.export
