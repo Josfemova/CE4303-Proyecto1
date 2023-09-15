@@ -8,7 +8,24 @@ module CE4303_Proyecto1(
     output [1:0] dram_ba,
     output dram_cas_n, dram_ras_n, dram_clk, dram_cke, dram_cs_n, dram_we_n,
            dram_udqm, dram_ldqm,
-    inout [15:0] dram_dq
+    inout [15:0] dram_dq,
+	// DDR3 SDRAM
+    output		[14: 0]	HPS_DDR3_ADDR,
+    output		[ 2: 0] HPS_DDR3_BA,
+    output				HPS_DDR3_CAS_N,
+    output				HPS_DDR3_CKE,
+    output				HPS_DDR3_CK_N,
+    output				HPS_DDR3_CK_P,
+    output				HPS_DDR3_CS_N,
+    output		[ 3: 0]	HPS_DDR3_DM,
+    inout		[31: 0]	HPS_DDR3_DQ,
+    inout		[ 3: 0]	HPS_DDR3_DQS_N,
+    inout		[ 3: 0]	HPS_DDR3_DQS_P,
+    output				HPS_DDR3_ODT,
+    output				HPS_DDR3_RAS_N,
+    output				HPS_DDR3_RESET_N,
+    input				HPS_DDR3_RZQ,
+    output				HPS_DDR3_WE_N
 );
 
 logic [23:0] pio_7_seg;
@@ -28,7 +45,25 @@ platform instancia_nios(
 		.sdram_wire_dq(dram_dq),    //           .dq
 		.sdram_wire_dqm({dram_udqm, dram_ldqm}),   //           .dqm
 		.sdram_wire_ras_n(dram_ras_n), //           .ras_n
-		.sdram_wire_we_n(dram_we_n)   //           .we_n
+		.sdram_wire_we_n(dram_we_n),   //           .we_n
+		
+	// DDR3 SDRAM
+	.memory_mem_a			(HPS_DDR3_ADDR),
+	.memory_mem_ba			(HPS_DDR3_BA),
+	.memory_mem_ck			(HPS_DDR3_CK_P),
+	.memory_mem_ck_n		(HPS_DDR3_CK_N),
+	.memory_mem_cke		(HPS_DDR3_CKE),
+	.memory_mem_cs_n		(HPS_DDR3_CS_N),
+	.memory_mem_ras_n		(HPS_DDR3_RAS_N),
+	.memory_mem_cas_n		(HPS_DDR3_CAS_N),
+	.memory_mem_we_n		(HPS_DDR3_WE_N),
+	.memory_mem_reset_n	(HPS_DDR3_RESET_N),
+	.memory_mem_dq			(HPS_DDR3_DQ),
+	.memory_mem_dqs		(HPS_DDR3_DQS_P),
+	.memory_mem_dqs_n		(HPS_DDR3_DQS_N),
+	.memory_mem_odt		(HPS_DDR3_ODT),
+	.memory_mem_dm			(HPS_DDR3_DM),
+	.memory_oct_rzqin		(HPS_DDR3_RZQ)
 );
 		
 seven_segment_driver seg0(.data_in(pio_7_seg[3:0]), .data_out(hex0));
