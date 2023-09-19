@@ -8,11 +8,11 @@ SRCDIR=src
 LIBS=
 
 # Headers dentro de include/
-_DEPS = 
+_DEPS = util.h parse.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 # Object files (.o) que haya que compilar 
-_OBJ = main.o
+_OBJ = main.o parse.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
