@@ -92,3 +92,8 @@ mem_init
 
 build
 obj
+
+# clangd LSP files
+
+compile_commands.json
+.cache
