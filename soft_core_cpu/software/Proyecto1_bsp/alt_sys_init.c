@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_tec' in SOPC Builder design 'platform'
  * SOPC Builder design path: ../../platform.sopcinfo
  *
- * Generated: Thu Sep 14 17:53:35 CST 2023
+ * Generated: Fri Sep 22 02:23:49 CST 2023
  */
 
 /*
@@ -68,7 +68,8 @@
 
 ALTERA_NIOS2_GEN2_IRQ_INSTANCE ( NIOS_TEC, nios_tec);
 ALTERA_AVALON_JTAG_UART_INSTANCE ( JTAG_UART_0, jtag_uart_0);
-ALTERA_AVALON_TIMER_INSTANCE ( TIMER_0_MS, timer_0_ms);
+ALTERA_AVALON_TIMER_INSTANCE ( TIMER0_1MS, timer0_1ms);
+ALTERA_AVALON_TIMER_INSTANCE ( TIMER1_100US, timer1_100us);
 
 /*
  * Initialize the interrupt controller devices
@@ -91,6 +92,7 @@ void alt_irq_init ( const void* base )
 
 void alt_sys_init( void )
 {
-    ALTERA_AVALON_TIMER_INIT ( TIMER_0_MS, timer_0_ms);
+    ALTERA_AVALON_TIMER_INIT ( TIMER0_1MS, timer0_1ms);
+    ALTERA_AVALON_TIMER_INIT ( TIMER1_100US, timer1_100us);
     ALTERA_AVALON_JTAG_UART_INIT ( JTAG_UART_0, jtag_uart_0);
 }

@@ -3,7 +3,7 @@
 # Machine generated for CPU 'nios_tec' in SOPC Builder design 'platform'
 # SOPC Builder design path: ../../platform.sopcinfo
 #
-# Generated: Fri Sep 15 01:12:37 CST 2023
+# Generated: Fri Sep 22 06:09:24 CST 2023
 
 # DO NOT MODIFY THIS FILE
 #
@@ -50,4 +50,4 @@
 memory 0x0 0x4000000 cache
 
 # onchip_mem
-memory 0x4020000 0x4030000 cache
+memory 0x4040000 0x4060000 cache

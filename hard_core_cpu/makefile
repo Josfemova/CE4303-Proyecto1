@@ -1,4 +1,4 @@
-CC=arm-none-linux-gnueabihf-gcc
+CC=arm-linux-gnueabihf-gcc
 CFLAGS=-g -I$(IDIR) -Wall -Wextra -Werror -static
 
 IDIR=include
@@ -8,7 +8,7 @@ SRCDIR=src
 LIBS=-lpthread
 
 # Headers dentro de include/
-_DEPS = misc.h
+_DEPS = misc.h types.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 # Object files (.o) que haya que compilar 

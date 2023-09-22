@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_tec' in SOPC Builder design 'platform'
  * SOPC Builder design path: ../../platform.sopcinfo
  *
- * Generated: Fri Sep 15 01:12:37 CST 2023
+ * Generated: Fri Sep 22 06:10:54 CST 2023
  */
 
 /*
@@ -65,9 +65,9 @@
  *
  */
 
-#define ONCHIP_MEM_REGION_BASE 0x4020020
-#define ONCHIP_MEM_REGION_SPAN 65504
-#define RESET_REGION_BASE 0x4020000
+#define ONCHIP_MEM_REGION_BASE 0x4040020
+#define ONCHIP_MEM_REGION_SPAN 131040
+#define RESET_REGION_BASE 0x4040000
 #define RESET_REGION_SPAN 32
 #define SDRAM_REGION_BASE 0x0
 #define SDRAM_REGION_SPAN 67108864
@@ -80,7 +80,7 @@
 
 #define ALT_EXCEPTIONS_DEVICE ONCHIP_MEM
 #define ALT_RESET_DEVICE ONCHIP_MEM
-#define ALT_RODATA_DEVICE SDRAM
+#define ALT_RODATA_DEVICE ONCHIP_MEM
 #define ALT_RWDATA_DEVICE SDRAM
 #define ALT_TEXT_DEVICE ONCHIP_MEM
 
@@ -98,7 +98,6 @@
  *
  */
 
-#define ALT_LOAD_COPY_RODATA
 #define ALT_LOAD_COPY_RWDATA
 
 #endif /* __LINKER_H_ */

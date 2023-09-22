@@ -1,4 +1,8 @@
 #ifndef MISC_H
 #define MISC_H
 
+#define HPS2FPGA_BRIDGE_BASE 0xC0000000UL
+#define HPS2FPGA_7SEG_BASE 0xC4000000UL
+#define HPS2FPGA_7SEG_SPAN 0x1
+
 #endif

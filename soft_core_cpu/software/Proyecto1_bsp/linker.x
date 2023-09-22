@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_tec' in SOPC Builder design 'platform'
  * SOPC Builder design path: ../../platform.sopcinfo
  *
- * Generated: Fri Sep 15 01:12:37 CST 2023
+ * Generated: Fri Sep 22 06:10:54 CST 2023
  */
 
 /*
@@ -51,13 +51,13 @@
 MEMORY
 {
     sdram : ORIGIN = 0x0, LENGTH = 67108864
-    reset : ORIGIN = 0x4020000, LENGTH = 32
-    onchip_mem : ORIGIN = 0x4020020, LENGTH = 65504
+    reset : ORIGIN = 0x4040000, LENGTH = 32
+    onchip_mem : ORIGIN = 0x4040020, LENGTH = 131040
 }
 
 /* Define symbols for each memory base-address */
 __alt_mem_sdram = 0x0;
-__alt_mem_onchip_mem = 0x4020000;
+__alt_mem_onchip_mem = 0x4040000;
 
 OUTPUT_FORMAT( "elf32-littlenios2",
                "elf32-littlenios2",
@@ -211,14 +211,7 @@ SECTIONS
         . = ALIGN(4);
     } > onchip_mem = 0x3a880100 /* NOP instruction (always in big-endian byte ordering) */
 
-    /*
-     *
-     * This section's LMA is set to the .text region.
-     * crt0 will copy to this section's specified mapped region virtual memory address (VMA)
-     *
-     */
-
-    .rodata : AT ( LOADADDR (.text) + SIZEOF (.text) )
+    .rodata :
     {
         PROVIDE (__ram_rodata_start = ABSOLUTE(.));
         . = ALIGN(4);
@@ -226,7 +219,7 @@ SECTIONS
         *(.rodata1)
         . = ALIGN(4);
         PROVIDE (__ram_rodata_end = ABSOLUTE(.));
-    } > sdram
+    } > onchip_mem
 
     PROVIDE (__flash_rodata_start = LOADADDR(.rodata));
 
