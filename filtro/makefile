@@ -8,11 +8,11 @@ SRCDIR=src
 LIBS=-lfreeimage -lpthread
 
 # Headers dentro de include/
-_DEPS = util.h parse.h memory.h timer.h filter.h
+_DEPS = util.h parse.h memory.h timer.h filter.h process.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 # Object files (.o) que haya que compilar 
-_OBJ = main.o parse.o memory.o timer.o filter.o
+_OBJ = main.o parse.o memory.o timer.o filter.o process.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
