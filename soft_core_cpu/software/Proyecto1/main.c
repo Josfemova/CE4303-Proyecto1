@@ -9,18 +9,12 @@
 #include "types.h"
 #include <string.h>
 
-void timer0_1ms_isr(void* context) {
-  // si hay más de dos filas descifradas, aplica filtro hasta agotar los pixeles
-  // descifrados que se pueden filtrar
-
-  // si ya llego a filter_hps_start deja de filtrar y apaga el ISR. Setea
-  // nios_filter_done
-}
-
 // Alineado a 4KB porque el mapeo lo requiere
 volatile shared_data_t shared_data __attribute__((aligned(0x1000))) = {};
 int d = 0;
 int n = 0;
+int width;
+int height;
 
 #define START_MASK 0x1
 #define STEP_MASK 0x2
@@ -35,12 +29,53 @@ int n = 0;
 #define LAST_7SEG 0x5
 
 unsigned static current_7_seg = 0;
-unsigned static current_pixel = 0;
+unsigned static decrypt_px_count = 0;
 unsigned static has_started = 0;
 
 unsigned get_mode() {
   unsigned pio_sw = IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE);
   return (pio_sw & 0x2) >> 1;
+}
+
+void start(){
+	  has_started = 1;
+	  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0); // Set 7seg to zero
+
+	  IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER1_100US_BASE,
+			  	  ALTERA_AVALON_TIMER_CONTROL_ITO_MSK
+				| ALTERA_AVALON_TIMER_CONTROL_CONT_MSK
+				| ALTERA_AVALON_TIMER_CONTROL_START_MSK);
+
+}
+
+
+void decrypt_px(){
+	decrypt_px_count += 1;
+	//  1. Add offset to current pixel
+	//  2. Decrypt pixel
+	//  3. Write pixel into memory
+}
+
+void timer1_100us_isr(void* context){
+
+	if(decrypt_px_count != (width * height)) {
+	    unsigned mode = get_mode();
+	    if (mode == AUTOMATIC_MODE) {
+	        decrypt_px();
+	    }
+	    IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, decrypt_px_count);
+	  }
+
+	// Limpiar el isr
+	IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER1_100US_BASE, 0);
+}
+
+void timer0_1ms_isr(void* context) {
+  // si hay más de dos filas descifradas, aplica filtro hasta agotar los pixeles
+  // descifrados que se pueden filtrar
+
+  // si ya llego a filter_hps_start deja de filtrar y apaga el ISR. Setea
+  // nios_filter_done
 }
 
 void increase_digit(int* number, int position) {
@@ -60,12 +95,22 @@ void increase_digit(int* number, int position) {
 }
 
 void sw_isr(void* context) {
-  int key_selected = IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE) & 0x1;
-  if (key_selected) {
-    IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, d);
-  } else {
-    IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, n);
-  }
+	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_SW_BASE, 0x0);  // limpiar el isr
+	int key_selected = IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE) & 0x1;
+	if (key_selected) {
+		IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, d);
+	} else {
+		IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, n);
+	}
+}
+
+void increase(){
+    if (IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE) & 0x1) {
+      increase_digit(&d, current_7_seg);
+    } else {
+      increase_digit(&n, current_7_seg);
+    }
+
 }
 
 void btn_isr(void* context) {
@@ -73,22 +118,24 @@ void btn_isr(void* context) {
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_BTN_BASE, 0x0);  // limpiar el isr
   switch (edge_capture & ACTION_BTN_MASK) {
     case UP_MASK:
-      if (IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE) & 0x1) {
-        increase_digit(&d, current_7_seg);
-      } else {
-        increase_digit(&n, current_7_seg);
-      }
+    	if(has_started == 0){
+    		increase();
+    	}
       break;
     case SHIFT_MASK:
-      current_7_seg = current_7_seg == LAST_7SEG ? 0 : (current_7_seg + 1);
+    	if(has_started == 0){
+    		current_7_seg = current_7_seg == LAST_7SEG ? 0 : (current_7_seg + 1);
+    	}
       break;
     case STEP_MASK:
-      if (get_mode() == MANUAL_MODE) {
-        current_pixel += 1;
-      }
+    	if(has_started == 1){
+    		if (get_mode() == MANUAL_MODE) {
+    			decrypt_px();
+    		}
+    	}
       break;
     case START_MASK:
-      has_started = 1;
+    	start();
       break;
     default:
       break;
@@ -99,24 +146,28 @@ void btn_isr(void* context) {
 }
 
 int main() {
-  printf("Hola\r\n");
-  strcpy((char*)shared_data.message, "System OK");
-  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0xFAFAFA);
-  // Initial handshake
-  uintptr_t shared_data_offset = ((uintptr_t)&shared_data) & 0x00FFFFFF;
-  printf("datos en 0x%x\r\n", shared_data_offset);
-  uintptr_t hps_handshake_val = HANDSHAKE_VAL_CALC(shared_data_offset);
-  // El puntero a datos compartidos se pasa via el reg del 7 Segmentos
-  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, shared_data_offset);
-  while (IORD_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE) != hps_handshake_val) {
-    // esperar a que el HPS confirme que recibió la dirección para el handshake
-  }
-  printf("Inicio\r\n");
-  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0);
-
+//  printf("Hola\r\n");
+//  strcpy((char*)shared_data.message, "System OK");
+//  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0xFAFAFA);
+//  // Initial handshake
+//  uintptr_t shared_data_offset = ((uintptr_t)&shared_data) & 0x00FFFFFF;
+//  printf("datos en 0x%x\r\n", shared_data_offset);
+//  uintptr_t hps_handshake_val = HANDSHAKE_VAL_CALC(shared_data_offset);
+//  // El puntero a datos compartidos se pasa via el reg del 7 Segmentos
+//  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, shared_data_offset);
+//  while (IORD_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE) != hps_handshake_val) {
+//    // esperar a que el HPS confirme que recibió la dirección para el handshake
+//  }
+//  printf("Inicio\r\n");
+//  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0);
+//
   IOWR_ALTERA_AVALON_PIO_IRQ_MASK(PIO_BTN_BASE, ACTION_BTN_MASK);
   IOWR_ALTERA_AVALON_PIO_IRQ_MASK(PIO_SW_BASE, ACTION_SW_MASK);
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_BTN_BASE, 0x0);
+  IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_SW_BASE, 0x0);
+
+  height = 20; // TODO: Read from header
+  width = 40; // TODO: Read from header
 
   alt_ic_isr_register(PIO_BTN_IRQ_INTERRUPT_CONTROLLER_ID, PIO_BTN_IRQ, btn_isr,
                       NULL, NULL);
@@ -124,29 +175,11 @@ int main() {
   alt_ic_isr_register(PIO_SW_IRQ_INTERRUPT_CONTROLLER_ID, PIO_SW_IRQ, sw_isr,
                       NULL, NULL);
 
-  while (has_started != 1)
-    ;  // TODO: Add condition image_copy_done = 1;
+  alt_ic_isr_register(TIMER1_100US_IRQ_INTERRUPT_CONTROLLER_ID, TIMER1_100US_IRQ,timer1_100us_isr,
+		  	  	  	  NULL,
+					  NULL
+  );
 
-  int decrypt_px_count = 0;  // TODO: Read value from header
-  int width = 20;            // TODO: Read value from header
-  int height = 40;           // TODO: Read value from header
-  while (decrypt_px_count != (width * height)) {
-    unsigned mode = get_mode();
-
-    if (mode == MANUAL_MODE) {
-      continue;
-      // Esperar por la interrupcion del boton
-    }
-
-    if (mode == AUTOMATIC_MODE) {
-      // TODO:  Decrypt pixel
-    }
-    IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, current_pixel);
-  }
-
-  // TODO: Set decrypt done
-
-  while (1)
-    ;
+  while (1);
   return 0;
 }
