@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+struct timespec pause_time = {.tv_sec = 0, .tv_nsec = 1000*TIMER_PERIOD};
+
 void *timer_thread(void *isr) {
   while (1) {
-    usleep(TIMER_PERIOD);
+		nanosleep(&pause_time, NULL);
     ((void (*)())isr)();
   }
 

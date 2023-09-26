@@ -58,7 +58,7 @@ void load_data(struct arguments args) {
 
   header.image_w = width;
   header.image_h = height;
-  header.filter_hps_start = width * height * args.percent_qsys + 1;
+  header.filter_hps_start = width * height * args.percent_qsys;
 
   *(struct shared_header *)sdram = header;
 
@@ -72,7 +72,7 @@ void load_data(struct arguments args) {
 struct shared_header *get_header() { return (struct shared_header *)sdram; }
 
 void save_filtered_image() {
-  BYTE *pixels = (BYTE *)sdram + DECRYPTED_IMAGE_SECTOR;
+  BYTE *pixels = (BYTE *)sdram + FILTERED_IMAGE_SECTOR;
   struct shared_header *header = get_header();
 
   FIBITMAP *dib =

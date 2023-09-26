@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "util.h"
 #include <pthread.h>
+#include <unistd.h>
 
 static int soft_filter_px_count = 0;
 void timer_isr_soft_core() {
@@ -36,13 +37,17 @@ void timer_isr_soft_core() {
                num_pixels_to_filter, header->image_w, header->image_h);
   soft_filter_px_count += num_pixels_to_filter;
 
+  printf("Nios: pixeles filtrados %d\t%d%%\n", soft_filter_px_count,
+         100 * soft_filter_px_count / header->filter_hps_start);
+
   // si ya llego a filter_hps_start deja de filtrar y apaga el
   // ISR. Setea nios_filter_done
   if (soft_filter_px_count == header->filter_hps_start) {
     header->nios_filter_done = true;
+    printf("Cortex FINISH\n");
+    // Apagar ISR
+    pthread_exit(0);
   }
-  // Apagar ISR
-  pthread_exit(0);
 }
 
 static int hard_filter_px_count = 0;
@@ -80,24 +85,37 @@ void proceso_periódico_hard_core() {
                num_pixels_to_filter, header->image_w, header->image_h);
   hard_filter_px_count += num_pixels_to_filter;
 
+  printf("Cortex: pixeles filtrados %d\t%d%%\n", hard_filter_px_count,
+         100 * hard_filter_px_count /
+             (header->image_w * header->image_h - header->filter_hps_start));
+
   // si ya llego a filter_hps_start deja de filtrar y apaga el
   // ISR. Setea nios_filter_done
-  if (hard_filter_px_count == header->filter_hps_start) {
+  if (header->filter_hps_start + hard_filter_px_count ==
+      header->image_w * header->image_h) {
     header->hps_filter_done = true;
+    printf("Cortex FINISH\n");
+    // Apagar ISR
+    pthread_exit(0);
   }
-  // Apagar ISR
-  pthread_exit(0);
 }
 
 void main_loop_soft_core() {
   struct shared_header *header = get_header();
-  UNUSED(header);
-  // loop
-  // chequea switch de modo de descifrado
-  // si es manual, descifra hasta ver boton
-  // si es automático descifra de un solo, termina loop y pasa a
-  // siguiente pixel condición de salida: decrypt_px_count = width
-  // * height
 
-  // setear decrypt done
+  struct timespec pause_time;
+  pause_time.tv_sec = 0;
+  pause_time.tv_nsec = 10;
+
+  // loop
+  while (header->decrypt_px_count != header->image_w * header->image_h) {
+    // (modo automático, luego pongo manual)
+    // si es automático descifra de un solo, termina loop y pasa a
+    // siguiente pixel condición de salida: decrypt_px_count = width
+    // * height
+    header->decrypt_px_count++;
+    nanosleep(&pause_time, NULL);
+  }
+
+  header->decrypt_done = true;
 }
