@@ -5,14 +5,14 @@ IDIR=include
 ODIR=obj
 SRCDIR=src
 
-LIBS=
+LIBS=-lfreeimage
 
 # Headers dentro de include/
-_DEPS = util.h parse.h
+_DEPS = util.h parse.h memory.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 # Object files (.o) que haya que compilar 
-_OBJ = main.o parse.o
+_OBJ = main.o parse.o memory.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
