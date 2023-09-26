@@ -5,7 +5,7 @@ IDIR=include
 ODIR=obj
 SRCDIR=src
 
-LIBS=-lfreeimage -lpthread
+LIBS=-lfreeimage -lpthread -lm
 
 # Headers dentro de include/
 _DEPS = util.h parse.h memory.h timer.h filter.h process.h
