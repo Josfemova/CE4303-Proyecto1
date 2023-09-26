@@ -38,12 +38,12 @@ void load_data(struct arguments args) {
 
     dib = FreeImage_Load(image_format, ORIGINAL_IMAGE, 0);
   } else {
-    fprintf(stderr, "Error leyendo imagen descifrada en " ORIGINAL_IMAGE);
+    fprintf(stderr, "Error leyendo imagen descifrada en " ORIGINAL_IMAGE "\n");
     exit(1);
   }
 
   if (dib == NULL) {
-    fprintf(stderr, "Error leyendo imagen descifrada");
+    fprintf(stderr, "Error leyendo imagen descifrada\n");
     exit(1);
     return;
   }
@@ -55,8 +55,6 @@ void load_data(struct arguments args) {
 
   unsigned width = FreeImage_GetWidth(dib);
   unsigned height = FreeImage_GetHeight(dib);
-  printf("width: %d\n", width);
-  printf("height: %d\n", height);
 
   header.image_w = width;
   header.image_h = height;
