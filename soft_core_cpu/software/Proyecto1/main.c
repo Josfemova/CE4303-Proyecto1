@@ -8,6 +8,7 @@
 #include "system.h"
 #include "types.h"
 #include <string.h>
+#include <stdbool.h>
 
 // Alineado a 4KB porque el mapeo lo requiere
 volatile shared_data_t shared_data __attribute__((aligned(0x1000))) = {};
@@ -48,22 +49,26 @@ void start(){
 
 }
 
+bool isImageCopyDone(){
+	bool imageCopyDone = shared_data.image_copy_done;
+	return imageCopyDone;
+}
+
 
 void decrypt_px(){
+	u32 current_pixel = shared_data.image_encrypted[decrypt_px_count];
+	// TODO: Apply RSA
+	IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, current_pixel);
 	decrypt_px_count += 1;
-	//  1. Add offset to current pixel
-	//  2. Decrypt pixel
-	//  3. Write pixel into memory
 }
 
 void timer1_100us_isr(void* context){
 
-	if(decrypt_px_count != (width * height)) {
+	if(decrypt_px_count != (width * height) && isImageCopyDone()) {
 	    unsigned mode = get_mode();
 	    if (mode == AUTOMATIC_MODE) {
 	        decrypt_px();
 	    }
-	    IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, decrypt_px_count);
 	  }
 
 	// Limpiar el isr
@@ -128,7 +133,7 @@ void btn_isr(void* context) {
     	}
       break;
     case STEP_MASK:
-    	if(has_started == 1){
+    	if(has_started == 1 && isImageCopyDone()){
     		if (get_mode() == MANUAL_MODE) {
     			decrypt_px();
     		}
@@ -146,28 +151,32 @@ void btn_isr(void* context) {
 }
 
 int main() {
-//  printf("Hola\r\n");
-//  strcpy((char*)shared_data.message, "System OK");
-//  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0xFAFAFA);
-//  // Initial handshake
-//  uintptr_t shared_data_offset = ((uintptr_t)&shared_data) & 0x00FFFFFF;
-//  printf("datos en 0x%x\r\n", shared_data_offset);
-//  uintptr_t hps_handshake_val = HANDSHAKE_VAL_CALC(shared_data_offset);
-//  // El puntero a datos compartidos se pasa via el reg del 7 Segmentos
-//  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, shared_data_offset);
-//  while (IORD_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE) != hps_handshake_val) {
-//    // esperar a que el HPS confirme que recibió la dirección para el handshake
-//  }
-//  printf("Inicio\r\n");
-//  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0);
-//
+  printf("Hola\r\n");
+  strcpy((char*)shared_data.message, "System OK");
+  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0xFAFAFA);
+  // Initial handshake
+  uintptr_t shared_data_offset = ((uintptr_t)&shared_data) & 0x00FFFFFF;
+  printf("datos en 0x%x\r\n", shared_data_offset);
+  uintptr_t hps_handshake_val = HANDSHAKE_VAL_CALC(shared_data_offset);
+  // El puntero a datos compartidos se pasa via el reg del 7 Segmentos
+  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, shared_data_offset);
+  while (IORD_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE) != hps_handshake_val) {
+    // esperar a que el HPS confirme que recibió la dirección para el handshake
+  }
+  printf("Inicio\r\n");
+  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0);
+
   IOWR_ALTERA_AVALON_PIO_IRQ_MASK(PIO_BTN_BASE, ACTION_BTN_MASK);
   IOWR_ALTERA_AVALON_PIO_IRQ_MASK(PIO_SW_BASE, ACTION_SW_MASK);
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_BTN_BASE, 0x0);
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_SW_BASE, 0x0);
 
-  height = 20; // TODO: Read from header
-  width = 40; // TODO: Read from header
+  // El alto y ancho estan inicialmente encriptados.
+  // TODO: 1. Read value from shared_data
+  //	   2. Apply RSA
+  // 	   3. Overwrite values in shared_data
+  height = shared_data.image_h;
+  width = shared_data.image_w;
 
   alt_ic_isr_register(PIO_BTN_IRQ_INTERRUPT_CONTROLLER_ID, PIO_BTN_IRQ, btn_isr,
                       NULL, NULL);

@@ -1,7 +1,13 @@
+#include <cinttypes>
+#include <cstdio>
+#include <cstdlib>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "misc.h"
 #include "types.h"
@@ -11,11 +17,12 @@ int main(int argc, char* argv[]) {
   char* input_file = argv[1];
   char* output_file_decrypted = argv[2];
   char* output_file_filtered = argv[3];
+  int nios_processing_percentage = atoi(argv[4]);
   int fd;
   (void)argc;
-  (void)input_file;
   (void)output_file_decrypted;
   (void)output_file_filtered;
+  (void)nios_processing_percentage;
   //-------------------- Mapeado y Handshake --------------------------------//
   // Abrir /dev/mem
   if ((fd = open("/dev/mem", (O_RDWR | O_SYNC))) == -1) {
@@ -49,11 +56,51 @@ int main(int argc, char* argv[]) {
   *virtual_7seg_pio = HANDSHAKE_VAL_CALC(*virtual_7seg_pio);
   // Verificar mensaje
   printf("Embededd message: %s \r\n", shared_data->message);
-  shared_data->image_copy_done = false;
+  
 
-  // abrir archivo
+  
+
   // copia contenidos del archivo a sdram
+    FILE *file = fopen(input_file, "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    int num;
+    int result;
+    int count = 0;
+    while (1) {
+        // Attempt to read an integer
+        result = fscanf(file, "%d,", &num);
+
+        if (result == EOF) {
+            break; // End of file
+        } else if (result == 1) {
+
+            if(count == 0){
+              shared_data->image_w = num;
+              continue;
+            }
+            if(count == 1){
+              shared_data->image_h = num;
+              continue;
+            }
+
+            shared_data->image_encrypted[count - 2] = num;
+
+        } else {
+            // Incomplete or invalid input, read and discard the rest of the line
+            char buffer[1024];
+            fgets(buffer, sizeof(buffer), file);
+        }
+    }
+
+    fclose(file);
+    return 0;
+
   // setea image_copy_done
+  shared_data->image_copy_done = 1;
   // spawn a proceso periodico que chequea si hay pixeles pa procesar
 
   // --------------------------- Final de programa ---------------------------//
