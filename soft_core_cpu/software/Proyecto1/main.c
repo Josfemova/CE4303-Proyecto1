@@ -54,10 +54,29 @@ bool isImageCopyDone(){
 	return imageCopyDone;
 }
 
+// Right-to-left binary method
+// https://en.wikipedia.org/wiki/Modular_exponentiation#Right-to-left_binary_method
+u32 mod_exp(u32 base, u32 exponent, u32 modulus) {
+    u32 result = 1;
+    base %= modulus;
+
+    while (exponent > 0) {
+        if (exponent % 2 == 1) {
+            result = (result * base) % modulus;
+        }
+
+        base = (base * base) % modulus;
+        exponent /= 2; //assuming this works as a floor function
+    }
+
+    return result;
+}
 
 void decrypt_px(){
 	u32 current_pixel = shared_data.image_encrypted[decrypt_px_count];
-	// TODO: Apply RSA
+	
+  current_pixel = mod_exp(current_pixel, d, n)
+
 	IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, current_pixel);
 	decrypt_px_count += 1;
 }
@@ -171,10 +190,6 @@ int main() {
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_BTN_BASE, 0x0);
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_SW_BASE, 0x0);
 
-  // El alto y ancho estan inicialmente encriptados.
-  // TODO: 1. Read value from shared_data
-  //	   2. Apply RSA
-  // 	   3. Overwrite values in shared_data
   height = shared_data.image_h;
   width = shared_data.image_w;
 
