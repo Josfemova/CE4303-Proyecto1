@@ -85,7 +85,7 @@ uint8_t filter_pixel(uint8_t *image, size_t idx, size_t image_w,
   // 0 0 0
   // 0 0 x
   // 0 0 0
-  if (left_border) {
+  if (right_border) {
     pixels[5] = (float)image[idx];
   } else {
     pixels[5] = (float)image[idx + 1];
