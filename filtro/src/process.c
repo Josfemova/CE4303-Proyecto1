@@ -23,12 +23,11 @@ void timer_isr_soft_core() {
         header->filter_hps_start - soft_filter_px_count;
   }
 
-  // Esperar a que hayan 2 filas al inicio
-  if (soft_filter_px_count == 0 &&
-      (unfiltered_decrypted_px_count > 2 * header->image_w)) {
-    num_pixels_to_filter = unfiltered_decrypted_px_count;
-  } else if ((soft_filter_px_count > 0) || header->decrypt_done) {
-    // Si ya empezó filtrado no esperar
+  // Esperar a que hayan 2 filas o esté desencriptado hasta el final
+  // (donde final = donde empieza cortex)
+  if ((unfiltered_decrypted_px_count > 2 * header->image_w) ||
+      (unfiltered_decrypted_px_count ==
+       header->filter_hps_start - soft_filter_px_count)) {
     num_pixels_to_filter = unfiltered_decrypted_px_count;
   }
 
@@ -44,7 +43,7 @@ void timer_isr_soft_core() {
   // ISR. Setea nios_filter_done
   if (soft_filter_px_count == header->filter_hps_start) {
     header->nios_filter_done = true;
-    printf("Cortex FINISH\n");
+    printf("Nios FINISH\n");
     // Apagar ISR
     pthread_exit(0);
   }
@@ -69,13 +68,14 @@ void proceso_periódico_hard_core() {
                                       header->filter_hps_start -
                                       hard_filter_px_count;
 
-  // Asegurar que hayan 2 filas descifradas antes de empezar
-  if (hard_filter_px_count == 0 &&
-      ((header->filter_hps_start + unfiltered_decrypted_px_count) >
-       2 * header->image_w)) {
-    num_pixels_to_filter = unfiltered_decrypted_px_count;
-  } else if ((hard_filter_px_count > 0) || header->decrypt_done) {
-    // Si ya empezó filtrado no esperar
+  // Truncar a 0 (puede ser negativo si no ha llegado al filter_hps_start)
+  if (unfiltered_decrypted_px_count < 0) {
+    unfiltered_decrypted_px_count = 0;
+  }
+
+  // Esperar a que hayan 2 filas o esté desencriptado hasta el final
+  if (unfiltered_decrypted_px_count > 2 * header->image_w ||
+      header->decrypt_done) {
     num_pixels_to_filter = unfiltered_decrypted_px_count;
   }
 
