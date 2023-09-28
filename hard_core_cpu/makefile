@@ -5,14 +5,14 @@ IDIR=include
 ODIR=obj
 SRCDIR=src
 
-LIBS=-lpthread
+LIBS=-lpthread -lm
 
 # Headers dentro de include/
-_DEPS = misc.h types.h
+_DEPS = misc.h types.h filter.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 # Object files (.o) que haya que compilar 
-_OBJ = main.o 
+_OBJ = main.o filter.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
