@@ -152,8 +152,8 @@ void proceso_periodico() {
     num_pixels_to_filter = unfiltered_decrypted_px_count;
   }
 
-  apply_filter((uint32_t *)shared_data->image_encrypted,
-               (uint8_t *)shared_data->image_filtered,
+  apply_filter((uint32_t *)&shared_data->image_encrypted[0],
+               (uint8_t *)&shared_data->image_filtered[0],
                shared_data->filter_hps_start + filter_px_count,
                num_pixels_to_filter, shared_data->image_w,
                shared_data->image_h);

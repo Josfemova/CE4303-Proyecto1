@@ -7,8 +7,10 @@
 #include "sys/alt_irq.h"
 #include "system.h"
 #include "types.h"
-#include <string.h>
 #include <stdbool.h>
+#include <string.h>
+
+#include "filter.c"
 
 // Alineado a 4KB porque el mapeo lo requiere
 volatile shared_data_t shared_data __attribute__((aligned(0x1000))) = {};
@@ -31,6 +33,7 @@ int height;
 
 unsigned static current_7_seg = 0;
 unsigned static decrypt_px_count = 0;
+unsigned static filter_px_count = 0;
 unsigned static has_started = 0;
 
 unsigned get_mode() {
@@ -38,71 +41,103 @@ unsigned get_mode() {
   return (pio_sw & 0x2) >> 1;
 }
 
-void start(){
-	  has_started = 1;
-	  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0); // Set 7seg to zero
+void start() {
+  has_started = 1;
+  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0); // Set 7seg to zero
 
-	  IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER1_100US_BASE,
-			  	  ALTERA_AVALON_TIMER_CONTROL_ITO_MSK
-				| ALTERA_AVALON_TIMER_CONTROL_CONT_MSK
-				| ALTERA_AVALON_TIMER_CONTROL_START_MSK);
-
+  IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER1_100US_BASE,
+                                   ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |
+                                       ALTERA_AVALON_TIMER_CONTROL_CONT_MSK |
+                                       ALTERA_AVALON_TIMER_CONTROL_START_MSK);
 }
 
-bool isImageCopyDone(){
-	bool imageCopyDone = shared_data.image_copy_done;
-	return imageCopyDone;
+bool isImageCopyDone() {
+  bool imageCopyDone = shared_data.image_copy_done;
+  return imageCopyDone;
 }
 
 // Right-to-left binary method
 // https://en.wikipedia.org/wiki/Modular_exponentiation#Right-to-left_binary_method
 u32 mod_exp(u32 base, u32 exponent, u32 modulus) {
-    u32 result = 1;
-    base %= modulus;
+  u32 result = 1;
+  base %= modulus;
 
-    while (exponent > 0) {
-        if (exponent % 2 == 1) {
-            result = (result * base) % modulus;
-        }
-
-        base = (base * base) % modulus;
-        exponent /= 2; //assuming this works as a floor function
+  while (exponent > 0) {
+    if (exponent % 2 == 1) {
+      result = (result * base) % modulus;
     }
 
-    return result;
+    base = (base * base) % modulus;
+    exponent /= 2; // assuming this works as a floor function
+  }
+
+  return result;
 }
 
-void decrypt_px(){
-	u32 current_pixel = shared_data.image_encrypted[decrypt_px_count];
-	
+void decrypt_px() {
+  u32 current_pixel = shared_data.image_encrypted[decrypt_px_count];
+
   current_pixel = mod_exp(current_pixel, d, n)
 
-	IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, current_pixel);
-	decrypt_px_count += 1;
+      IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, current_pixel);
+  decrypt_px_count += 1;
 }
 
-void timer1_100us_isr(void* context){
+void timer1_100us_isr(void *context) {
 
-	if(decrypt_px_count != (width * height) && isImageCopyDone()) {
-	    unsigned mode = get_mode();
-	    if (mode == AUTOMATIC_MODE) {
-	        decrypt_px();
-	    }
-	  }
+  if (decrypt_px_count != (width * height) && isImageCopyDone()) {
+    unsigned mode = get_mode();
+    if (mode == AUTOMATIC_MODE) {
+      decrypt_px();
+    }
+  }
 
-	// Limpiar el isr
-	IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER1_100US_BASE, 0);
+  // Limpiar el isr
+  IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER1_100US_BASE, 0);
 }
 
-void timer0_1ms_isr(void* context) {
+void timer0_1ms_isr(void *context) {
   // si hay más de dos filas descifradas, aplica filtro hasta agotar los pixeles
   // descifrados que se pueden filtrar
+  int num_pixels_to_filter = 0;
 
-  // si ya llego a filter_hps_start deja de filtrar y apaga el ISR. Setea
-  // nios_filter_done
+  int unfiltered_decrypted_px_count =
+      shared_data.decrypt_px_count - filter_px_count;
+
+  if (filter_px_count + unfiltered_decrypted_px_count >
+      shared_data.filter_hps_start) {
+    // Truncar pixeles a procesar con el filter_hps_start
+    unfiltered_decrypted_px_count =
+        shared_data.filter_hps_start - filter_px_count;
+  }
+
+  // Esperar a que hayan 2 filas o esté desencriptado hasta el final
+  // (donde final = donde empieza cortex)
+  if ((unfiltered_decrypted_px_count > 2 * shared_data.image_w) ||
+      (unfiltered_decrypted_px_count ==
+       shared_data.filter_hps_start - filter_px_count)) {
+    num_pixels_to_filter = unfiltered_decrypted_px_count;
+  }
+
+  apply_filter((uint32_t *)&shared_data.image_encrypted[0],
+               (uint8_t *)&shared_data.image_filtered[0], filter_px_count,
+               num_pixels_to_filter, shared_data.image_w, shared_data.image_h);
+  filter_px_count += num_pixels_to_filter;
+
+  printf("Nios: pixeles filtrados %d\t%d%%\n", filter_px_count,
+         100 * filter_px_count / shared_data.filter_hps_start);
+
+  // si ya llego a filter_hps_start deja de filtrar y apaga el
+  // ISR. Setea nios_filter_done
+  if (filter_px_count == shared_data.filter_hps_start) {
+    shared_data.nios_filter_done = true;
+    printf("Nios FINISH\n");
+    // TODO: Apagar ISR
+    pthread_exit(0);
+  }
 }
 
-void increase_digit(int* number, int position) {
+void increase_digit(int *number, int position) {
   int digit = (*number >> (position * 4)) & 0xF;
   int newDigit = digit + 2;
 
@@ -118,51 +153,50 @@ void increase_digit(int* number, int position) {
   IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, *number);
 }
 
-void sw_isr(void* context) {
-	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_SW_BASE, 0x0);  // limpiar el isr
-	int key_selected = IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE) & 0x1;
-	if (key_selected) {
-		IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, d);
-	} else {
-		IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, n);
-	}
+void sw_isr(void *context) {
+  IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_SW_BASE, 0x0); // limpiar el isr
+  int key_selected = IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE) & 0x1;
+  if (key_selected) {
+    IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, d);
+  } else {
+    IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, n);
+  }
 }
 
-void increase(){
-    if (IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE) & 0x1) {
-      increase_digit(&d, current_7_seg);
-    } else {
-      increase_digit(&n, current_7_seg);
-    }
-
+void increase() {
+  if (IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE) & 0x1) {
+    increase_digit(&d, current_7_seg);
+  } else {
+    increase_digit(&n, current_7_seg);
+  }
 }
 
-void btn_isr(void* context) {
+void btn_isr(void *context) {
   int edge_capture = IORD_ALTERA_AVALON_PIO_EDGE_CAP(PIO_BTN_BASE);
-  IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_BTN_BASE, 0x0);  // limpiar el isr
+  IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_BTN_BASE, 0x0); // limpiar el isr
   switch (edge_capture & ACTION_BTN_MASK) {
-    case UP_MASK:
-    	if(has_started == 0){
-    		increase();
-    	}
-      break;
-    case SHIFT_MASK:
-    	if(has_started == 0){
-    		current_7_seg = current_7_seg == LAST_7SEG ? 0 : (current_7_seg + 1);
-    	}
-      break;
-    case STEP_MASK:
-    	if(has_started == 1 && isImageCopyDone()){
-    		if (get_mode() == MANUAL_MODE) {
-    			decrypt_px();
-    		}
-    	}
-      break;
-    case START_MASK:
-    	start();
-      break;
-    default:
-      break;
+  case UP_MASK:
+    if (has_started == 0) {
+      increase();
+    }
+    break;
+  case SHIFT_MASK:
+    if (has_started == 0) {
+      current_7_seg = current_7_seg == LAST_7SEG ? 0 : (current_7_seg + 1);
+    }
+    break;
+  case STEP_MASK:
+    if (has_started == 1 && isImageCopyDone()) {
+      if (get_mode() == MANUAL_MODE) {
+        decrypt_px();
+      }
+    }
+    break;
+  case START_MASK:
+    start();
+    break;
+  default:
+    break;
   }
   // retardo para consideraciones de latencia, ver:
   // https://www.intel.com/content/www/us/en/docs/programmable/683525/21-3/an-isr-to-service-a-button-pio-interrupt.html
@@ -171,7 +205,7 @@ void btn_isr(void* context) {
 
 int main() {
   printf("Hola\r\n");
-  strcpy((char*)shared_data.message, "System OK");
+  strcpy((char *)shared_data.message, "System OK");
   IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0xFAFAFA);
   // Initial handshake
   uintptr_t shared_data_offset = ((uintptr_t)&shared_data) & 0x00FFFFFF;
@@ -199,11 +233,10 @@ int main() {
   alt_ic_isr_register(PIO_SW_IRQ_INTERRUPT_CONTROLLER_ID, PIO_SW_IRQ, sw_isr,
                       NULL, NULL);
 
-  alt_ic_isr_register(TIMER1_100US_IRQ_INTERRUPT_CONTROLLER_ID, TIMER1_100US_IRQ,timer1_100us_isr,
-		  	  	  	  NULL,
-					  NULL
-  );
+  alt_ic_isr_register(TIMER1_100US_IRQ_INTERRUPT_CONTROLLER_ID,
+                      TIMER1_100US_IRQ, timer1_100us_isr, NULL, NULL);
 
-  while (1);
+  while (1)
+    ;
   return 0;
 }
