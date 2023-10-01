@@ -77,9 +77,10 @@ u32 mod_exp(u32 base, u32 exponent, u32 modulus) {
 void decrypt_px() {
   u32 current_pixel = shared_data.image_encrypted[decrypt_px_count];
 
-  current_pixel = mod_exp(current_pixel, d, n)
+  current_pixel = mod_exp(current_pixel, d, n);
 
-      IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, current_pixel);
+  IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, current_pixel);
+  
   decrypt_px_count += 1;
 }
 
