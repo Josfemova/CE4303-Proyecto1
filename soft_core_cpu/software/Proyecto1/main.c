@@ -134,7 +134,7 @@ void timer0_1ms_isr(void *context) {
     shared_data.nios_filter_done = true;
     printf("Nios FINISH\n");
     // TODO: Apagar ISR
-    pthread_exit(0);
+    // pthread_exit(0); //! pthread no existe en el soft core
   }
 }
 

@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
   volatile u32 *virtual_7seg_pio = (u32 *)map_result;
   // Leer valor del puntero de los datos compartidos
   off_t shared_data_base = HPS2FPGA_BRIDGE_BASE + (*virtual_7seg_pio);
-  printf("shared data lives at 0x%lx\r\n", shared_data_base);
+  printf("shared data lives at 0x%lx\r\n", (unsigned long) shared_data_base);
   // mapear datos compartidos en memoria virtual
   map_result = mmap(NULL, sizeof(shared_data_t), (PROT_READ | PROT_WRITE),
                     MAP_SHARED, fd, shared_data_base);
