@@ -17,6 +17,22 @@ static unsigned filter_px_count = 0;
 
 void *timer_thread();
 
+void save_image(void *memory_start, size_t size, const char *file_name) {
+    FILE *file = fopen(file_name, "wb"); // abrir archivo en binary write
+
+    if (file == NULL) {
+        printf("Failed to open file.\n");
+        return;
+    }
+    
+    // escribir size cantidad de datos, cada uno de tamaño 32, a partir de la
+    // dirección memory_start, en el archivo fle
+    fwrite(memory_start, 32, size, file);
+
+    fclose(file);
+    printf("Image successfully written to %s\n", file_name);
+}
+
 int main(int argc, char *argv[]) {
   // rutas de archivo
   char *input_file = argv[1];
@@ -112,6 +128,9 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Error creando timer\n");
     return 1;
   }
+
+  // Escribir imagen a disco
+  save_image((uint32_t *)&shared_data->image_encrypted[0], shared_data->image_w * shared_data->image_h, output_file_filtered);
 
   // --------------------------- Final de programa ---------------------------//
   // eliminar mapeos
