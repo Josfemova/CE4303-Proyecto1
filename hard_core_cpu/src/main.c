@@ -17,6 +17,22 @@ static unsigned filter_px_count = 0;
 
 void *timer_thread();
 
+void save_image(void *memory_start, size_t size, const char *file_name) {
+    FILE *file = fopen(file_name, "wb"); // abrir archivo en binary write
+
+    if (file == NULL) {
+        printf("Failed to open file.\n");
+        return;
+    }
+    
+    // escribir size cantidad de datos, cada uno de tamaño 32, a partir de la
+    // dirección memory_start, en el archivo fle
+    fwrite(memory_start, 32, size, file);
+
+    fclose(file);
+    printf("Image successfully written to %s\n", file_name);
+}
+
 int main(int argc, char *argv[]) {
   // rutas de archivo
   char *input_file = argv[1];
@@ -46,7 +62,7 @@ int main(int argc, char *argv[]) {
   volatile u32 *virtual_7seg_pio = (u32 *)map_result;
   // Leer valor del puntero de los datos compartidos
   off_t shared_data_base = HPS2FPGA_BRIDGE_BASE + (*virtual_7seg_pio);
-  printf("shared data lives at 0x%lx\r\n", shared_data_base);
+  printf("shared data lives at 0x%lx\r\n", (unsigned long) shared_data_base);
   // mapear datos compartidos en memoria virtual
   map_result = mmap(NULL, sizeof(shared_data_t), (PROT_READ | PROT_WRITE),
                     MAP_SHARED, fd, shared_data_base);
@@ -98,6 +114,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  //Calcular pixel para filtro
+  shared_data->filter_hps_start = shared_data->image_h * shared_data->image_w * nios_processing_percentage;
+
   fclose(file);
   return 0;
 
@@ -109,6 +128,9 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Error creando timer\n");
     return 1;
   }
+
+  // Escribir imagen a disco
+  save_image((uint32_t *)&shared_data->image_encrypted[0], shared_data->image_w * shared_data->image_h, output_file_filtered);
 
   // --------------------------- Final de programa ---------------------------//
   // eliminar mapeos
