@@ -45,7 +45,14 @@ void start() {
   has_started = 1;
   IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0); // Set 7seg to zero
 
+  // inicia descifrado
   IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER1_100US_BASE,
+                                   ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |
+                                       ALTERA_AVALON_TIMER_CONTROL_CONT_MSK |
+                                       ALTERA_AVALON_TIMER_CONTROL_START_MSK);
+
+  // inicia filtrado
+  IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER0_1MS_BASE,
                                    ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |
                                        ALTERA_AVALON_TIMER_CONTROL_CONT_MSK |
                                        ALTERA_AVALON_TIMER_CONTROL_START_MSK);
@@ -236,6 +243,11 @@ int main() {
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_SW_BASE, 0x0);
 
   decrypt_wh();
+  printf("Tamaño descifrado\r\n");
+
+  //Calcular pixel para filtro
+  shared_data.filter_hps_start = (u32) ((shared_data.image_h * shared_data.image_w) * (shared_data.filter_hps_start/100));
+
 
   alt_ic_isr_register(PIO_BTN_IRQ_INTERRUPT_CONTROLLER_ID, PIO_BTN_IRQ, btn_isr,
                       NULL, NULL);

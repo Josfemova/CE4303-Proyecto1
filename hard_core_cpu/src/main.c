@@ -20,7 +20,7 @@ char *output_file_filtered;
 
 void *timer_thread();
 
-void save_image(void *memory_start, const char *file_name) {
+void save_image(uint8_t *memory_start, const char *file_name) {
     FILE *pFile;
     pFile = fopen(file_name, "wb");
 
@@ -29,13 +29,10 @@ void save_image(void *memory_start, const char *file_name) {
         return;
     }
 
-    // Agarrar puntero a imagen filtrada
-    uint8_t *pixels = (uint8_t *) memory_start;
-
     // Obtener tamaño de imagen con width*height
     size_t size = shared_data->image_h * shared_data->image_w;
 
-    fwrite(pixels, size, 1, pFile);
+    fwrite(memory_start, size, 1, pFile);
 
     fclose(pFile);
 }
@@ -153,11 +150,17 @@ void proceso_periodico() {
 
   if (shared_data->decrypt_done && shared_data->nios_filter_done && shared_data->hps_filter_done) {
     
-    //guardar imagen filtrada
-    save_image((uint32_t *)&shared_data->image_encrypted[0], output_file_filtered);
+    // compactar imagen
+    uint8_t *compacted_decrypted = (uint8_t *)&shared_data->image_encrypted[0];
+    for (size_t i = 0; i < shared_data->image_w * shared_data->image_h; i++) {
+      compacted_decrypted[i] = (uint8_t)shared_data->image_encrypted[i];
+    }
 
     //guardar imagen descifrada
-    save_image((uint32_t *)&shared_data->image_filtered[0], output_file_decrypted);
+    save_image(compacted_decrypted, output_file_decrypted);
+
+    //guardar imagen filtrada
+    save_image((uint8_t *)&shared_data->image_filtered[0], output_file_filtered);
 
     // Apagar thread
     pthread_exit(0);
