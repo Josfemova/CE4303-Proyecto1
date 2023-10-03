@@ -78,10 +78,19 @@ void decrypt_px() {
   u32 current_pixel = shared_data.image_encrypted[decrypt_px_count];
 
   current_pixel = mod_exp(current_pixel, d, n);
+  shared_data.image_encrypted[decrypt_px_count] = current_pixel;
 
   IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, current_pixel);
   
   decrypt_px_count += 1;
+}
+
+void decrypt_wh() {
+  u32 local_height = shared_data.image_h;
+  u32 local_width = shared_data.image_w;
+
+  height = mod_exp(local_height, d, n);
+  width = mod_exp(local_width, d, n);
 }
 
 void timer1_100us_isr(void *context) {
@@ -225,8 +234,7 @@ int main() {
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_BTN_BASE, 0x0);
   IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_SW_BASE, 0x0);
 
-  height = shared_data.image_h;
-  width = shared_data.image_w;
+  decrypt_wh();
 
   alt_ic_isr_register(PIO_BTN_IRQ_INTERRUPT_CONTROLLER_ID, PIO_BTN_IRQ, btn_isr,
                       NULL, NULL);
