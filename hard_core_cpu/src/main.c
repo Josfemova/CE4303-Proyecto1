@@ -98,6 +98,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  //Calcular pixel para filtro
+  shared_data->filter_hps_start = shared_data->image_h * shared_data->image_w * nios_processing_percentage;
+
   fclose(file);
   return 0;
 
