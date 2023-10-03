@@ -15,35 +15,39 @@
 volatile shared_data_t *shared_data;
 static unsigned filter_px_count = 0;
 
+char *output_file_decrypted;
+char *output_file_filtered;
+
 void *timer_thread();
 
-void save_image(void *memory_start, size_t size, const char *file_name) {
-    FILE *file = fopen(file_name, "wb"); // abrir archivo en binary write
+void save_image(void *memory_start, const char *file_name) {
+    FILE *pFile;
+    pFile = fopen(file_name, "wb");
 
-    if (file == NULL) {
+    if (pFile == NULL) {
         printf("Failed to open file.\n");
         return;
     }
-    
-    // escribir size cantidad de datos, cada uno de tamaño 32, a partir de la
-    // dirección memory_start, en el archivo fle
-    fwrite(memory_start, 32, size, file);
 
-    fclose(file);
-    printf("Image successfully written to %s\n", file_name);
+    // Agarrar puntero a imagen filtrada
+    uint8_t *pixels = (uint8_t *) memory_start;
+
+    // Obtener tamaño de imagen con width*height
+    size_t size = shared_data->image_h * shared_data->image_w;
+
+    fwrite(pixels, size, 1, pFile);
+
+    fclose(pFile);
 }
 
 int main(int argc, char *argv[]) {
   // rutas de archivo
   char *input_file = argv[1];
-  char *output_file_decrypted = argv[2];
-  char *output_file_filtered = argv[3];
+  output_file_decrypted = argv[2];
+  output_file_filtered = argv[3];
   int nios_processing_percentage = atoi(argv[4]);
   int fd;
   (void)argc;
-  (void)output_file_decrypted;
-  (void)output_file_filtered;
-  (void)nios_processing_percentage;
   //-------------------- Mapeado y Handshake --------------------------------//
   // Abrir /dev/mem
   if ((fd = open("/dev/mem", (O_RDWR | O_SYNC))) == -1) {
@@ -72,6 +76,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   shared_data = (shared_data_t *)map_result;
+
+  shared_data->filter_hps_start = nios_processing_percentage;
 
   // realizar handshake para indicarle al Nios que ya se puede seguir
   *virtual_7seg_pio = HANDSHAKE_VAL_CALC(*virtual_7seg_pio);
@@ -114,9 +120,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  //Calcular pixel para filtro
-  shared_data->filter_hps_start = shared_data->image_h * shared_data->image_w * nios_processing_percentage;
-
   fclose(file);
   return 0;
 
@@ -128,9 +131,6 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Error creando timer\n");
     return 1;
   }
-
-  // Escribir imagen a disco
-  save_image((uint32_t *)&shared_data->image_encrypted[0], shared_data->image_w * shared_data->image_h, output_file_filtered);
 
   // --------------------------- Final de programa ---------------------------//
   // eliminar mapeos
@@ -149,6 +149,20 @@ int main(int argc, char *argv[]) {
 }
 
 void proceso_periodico() {
+
+
+  if (shared_data->decrypt_done && shared_data->nios_filter_done && shared_data->hps_filter_done) {
+    
+    //guardar imagen filtrada
+    save_image((uint32_t *)&shared_data->image_encrypted[0], output_file_filtered);
+
+    //guardar imagen descifrada
+    save_image((uint32_t *)&shared_data->image_filtered[0], output_file_decrypted);
+
+    // Apagar thread
+    pthread_exit(0);
+  }
+
   // hay pixeles pa procesar por parte del HPS?
   if (shared_data->decrypt_px_count < shared_data->filter_hps_start) {
     return;
@@ -192,8 +206,6 @@ void proceso_periodico() {
       shared_data->image_w * shared_data->image_h) {
     shared_data->hps_filter_done = true;
     printf("Cortex FINISH\n");
-    // Apagar thread
-    pthread_exit(0);
   }
 }
 
