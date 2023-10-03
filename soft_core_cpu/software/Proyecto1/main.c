@@ -142,8 +142,9 @@ void timer0_1ms_isr(void *context) {
   if (filter_px_count == shared_data.filter_hps_start) {
     shared_data.nios_filter_done = true;
     printf("Nios FINISH\n");
-    // TODO: Apagar ISR
-    // pthread_exit(0); //! pthread no existe en el soft core
+    
+    // Limpiar el isr
+    IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER0_1MS_BASE, 0);
   }
 }
 
