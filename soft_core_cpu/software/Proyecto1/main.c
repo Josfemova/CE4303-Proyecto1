@@ -161,7 +161,7 @@ void timer0_10ms_isr(void *context) {
 
 void increase_digit(int *number, int position) {
   int digit = (*number >> (position * 4)) & 0xF;
-  int newDigit = digit + 2;
+  int newDigit = digit + 1;
 
   // Calculate a mask to clear the old digit at the specified position
   unsigned int clearMask = ~(0xF << (position * 4));
