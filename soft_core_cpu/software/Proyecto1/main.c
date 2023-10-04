@@ -158,12 +158,22 @@ void timer0_10ms_isr(void *context) {
         shared_data.filter_hps_start - filter_px_count;
   }
 
-  // Esperar a que hayan 2 filas o esté desencriptado hasta el final
+  // Esperar a que hayan 5 filas o esté desencriptado hasta el final
   // (donde final = donde empieza cortex)
-  if ((unfiltered_decrypted_px_count > 4 * shared_data.image_w) ||
+  if ((unfiltered_decrypted_px_count > 5 * shared_data.image_w) ||
       (unfiltered_decrypted_px_count ==
        shared_data.filter_hps_start - filter_px_count)) {
     num_pixels_to_filter = unfiltered_decrypted_px_count;
+  }
+
+  // Dar un buffer de filas que no toque hasta el final
+  if(!shared_data.decrypt_done){
+	  num_pixels_to_filter -= 2 * shared_data.image_w;
+  }
+
+  // Truncar a 0 (puede ser negativo)
+  if(num_pixels_to_filter < 0) {
+	  num_pixels_to_filter = 0;
   }
 
   apply_filter((uint32_t *)&shared_data.image_encrypted[0],

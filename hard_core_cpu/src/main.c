@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     result = fscanf(file, "%d,", &num);
     // printf("num %d", num);
     if (result == EOF) {
-      break; // End of file
+      break;  // End of file
     } else if (result == 1) {
       if (count == 0) {
         shared_data->image_w = (u32)num;
@@ -183,8 +183,8 @@ void proceso_periodico() {
   }
 
   // hay pixeles pa procesar por parte del HPS?
-  //! if (shared_data->decrypt_px_count < shared_data->filter_hps_start) {
-  if (!shared_data->decrypt_done) {
+  if (shared_data->decrypt_px_count < shared_data->filter_hps_start) {
+    // if (!shared_data->decrypt_done) {
     return;
   }
   // si sí, procesa lo que hay
@@ -242,7 +242,7 @@ void proceso_periodico() {
 void *timer_thread(void) {
   printf("se ejecuta \n");
   while (1) {
-    sleep(0.001); // 1ms
+    sleep(0.001);  // 1ms
     proceso_periodico();
     printf("se ejecuta \n");
   }
