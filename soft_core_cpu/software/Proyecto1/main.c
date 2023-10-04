@@ -167,7 +167,8 @@ void timer0_10ms_isr(void *context) {
   }
 
   // Dar un buffer de filas que no toque hasta el final
-  if(!shared_data.decrypt_done){
+  //if(!shared_data.decrypt_done){
+  if(shared_data.decrypt_px_count < shared_data.filter_hps_start){
 	  num_pixels_to_filter -= 2 * shared_data.image_w;
   }
 

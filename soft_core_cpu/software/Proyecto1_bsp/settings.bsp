@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Oct 4, 2023 9:17:37 AM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1696432657470</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>Oct 4, 2023 11:36:25 AM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1696440985974</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>/home/josfemova/REPOSITORIOS/CE4303-Proyecto1/soft_core_cpu/software/Proyecto1_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>../../platform.sopcinfo</SopcDesignFile>

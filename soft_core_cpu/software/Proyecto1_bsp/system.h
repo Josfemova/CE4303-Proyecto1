@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_tec' in SOPC Builder design 'platform'
  * SOPC Builder design path: ../../platform.sopcinfo
  *
- * Generated: Wed Oct 04 01:27:56 CST 2023
+ * Generated: Wed Oct 04 11:28:53 CST 2023
  */
 
 /*
@@ -394,15 +394,15 @@
 #define TIMER1_10MS_FREQ 100000000
 #define TIMER1_10MS_IRQ 4
 #define TIMER1_10MS_IRQ_INTERRUPT_CONTROLLER_ID 0
-#define TIMER1_10MS_LOAD_VALUE 9999
+#define TIMER1_10MS_LOAD_VALUE 999
 #define TIMER1_10MS_MULT 1.0E-6
 #define TIMER1_10MS_NAME "/dev/timer1_10ms"
-#define TIMER1_10MS_PERIOD 100
+#define TIMER1_10MS_PERIOD 10
 #define TIMER1_10MS_PERIOD_UNITS "us"
 #define TIMER1_10MS_RESET_OUTPUT 0
 #define TIMER1_10MS_SNAPSHOT 0
 #define TIMER1_10MS_SPAN 32
-#define TIMER1_10MS_TICKS_PER_SEC 10000
+#define TIMER1_10MS_TICKS_PER_SEC 100000
 #define TIMER1_10MS_TIMEOUT_PULSE_OUTPUT 0
 #define TIMER1_10MS_TYPE "altera_avalon_timer"
 

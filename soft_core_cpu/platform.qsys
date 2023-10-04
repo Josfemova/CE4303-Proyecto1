@@ -1080,7 +1080,7 @@
   <parameter name="alwaysRun" value="false" />
   <parameter name="counterSize" value="32" />
   <parameter name="fixedPeriod" value="true" />
-  <parameter name="period" value="100" />
+  <parameter name="period" value="10" />
   <parameter name="periodUnits" value="USEC" />
   <parameter name="resetOutput" value="false" />
   <parameter name="snapshot" value="false" />
