@@ -15,6 +15,8 @@
 volatile shared_data_t *shared_data;
 static unsigned filter_px_count = 0;
 
+//// se copio bien
+
 char *output_file_decrypted;
 char *output_file_filtered;
 
@@ -38,6 +40,8 @@ void save_image(uint8_t *memory_start, const char *file_name) {
 }
 
 int main(int argc, char *argv[]) {
+  printf("Todo esta bien\r\n");
+  
   // rutas de archivo
   char *input_file = argv[1];
   output_file_decrypted = argv[2];
@@ -94,22 +98,24 @@ int main(int argc, char *argv[]) {
   while (1) {
     // Attempt to read an integer
     result = fscanf(file, "%d,", &num);
-
+    //printf("num %d", num);
     if (result == EOF) {
       break; // End of file
     } else if (result == 1) {
 
       if (count == 0) {
-        shared_data->image_w = num;
+        shared_data->image_w = (u32) num;
+        count++;
         continue;
       }
       if (count == 1) {
-        shared_data->image_h = num;
-        continue;
+        shared_data->image_h = (u32) num;
+        count++;
+	continue;
       }
 
-      shared_data->image_encrypted[count - 2] = num;
-
+      shared_data->image_encrypted[count - 2] = (u32) num;
+      count++;
     } else {
       // Incomplete or invalid input, read and discard the rest of the line
       char buffer[1024];
@@ -120,14 +126,15 @@ int main(int argc, char *argv[]) {
   fclose(file);
 
   // setea image_copy_done
-  shared_data->image_copy_done = 1;
+  shared_data->image_copy_done = true;
   // spawn a proceso periodico que chequea si hay pixeles pa procesar
+  printf("image copy done %d \n", shared_data->image_copy_done);
   pthread_t thread;
   if (pthread_create(&thread, NULL, timer_thread, NULL) != 0) {
     fprintf(stderr, "Error creando timer\n");
     return 1;
   }
-
+  pthread_join(thread, NULL);
   // --------------------------- Final de programa ---------------------------//
   // eliminar mapeos
   if (munmap((void *)virtual_7seg_pio, HPS2FPGA_7SEG_SPAN) != 0) {
@@ -145,7 +152,18 @@ int main(int argc, char *argv[]) {
 }
 
 void proceso_periodico() {
+  printf("proceso periodico %d\n", shared_data->decrypt_done);
+ if(shared_data->decrypt_done == 1){
+    uint8_t *compacted_decrypted = (uint8_t *)&shared_data->image_encrypted[0];
+    for (size_t i = 0; i < 100; i++) {
+      compacted_decrypted[i] = (uint8_t)shared_data->image_encrypted[i];
+    }
 
+    //guardar imagen descifrada
+    save_image(compacted_decrypted, output_file_decrypted);
+    printf("se guarda"); 
+    pthread_exit(0);	
+ }
 
   if (shared_data->decrypt_done && shared_data->nios_filter_done && shared_data->hps_filter_done) {
     
@@ -212,10 +230,12 @@ void proceso_periodico() {
 }
 
 void *timer_thread(void) {
+  printf("se ejecuta \n");	  
   while (1) {
-    usleep(100);
+    sleep(0.001); //1ms
     proceso_periodico();
+    printf("se ejecuta \n");
   }
-
+ printf("sale \n");
   return 0;
 }
