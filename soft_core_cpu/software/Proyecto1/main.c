@@ -16,8 +16,7 @@
 volatile shared_data_t shared_data __attribute__((aligned(0x1000))) = {};
 int d = 0;
 int n = 0;
-int width;
-int height;
+
 
 #define START_MASK 0x1
 #define STEP_MASK 0x2
@@ -35,6 +34,7 @@ unsigned static current_7_seg = 0;
 unsigned static decrypt_px_count = 0;
 unsigned static filter_px_count = 0;
 unsigned static has_started = 0;
+void timer1_10ms_isr(void *context);
 
 unsigned get_mode() {
   unsigned pio_sw = IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE);
@@ -46,16 +46,21 @@ void start() {
   IOWR_ALTERA_AVALON_PIO_DATA(PIO_7SEG_BASE, 0x0); // Set 7seg to zero
 
   // inicia descifrado
-  IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER1_100US_BASE,
+  IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER1_10MS_BASE,
                                    ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |
                                        ALTERA_AVALON_TIMER_CONTROL_CONT_MSK |
                                        ALTERA_AVALON_TIMER_CONTROL_START_MSK);
 
+  alt_ic_isr_register(TIMER1_10MS_IRQ_INTERRUPT_CONTROLLER_ID,
+                      TIMER1_10MS_IRQ, timer1_10ms_isr, NULL, NULL);
+
+
   // inicia filtrado
-  IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER0_1MS_BASE,
+  IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER0_10MS_BASE,
                                    ALTERA_AVALON_TIMER_CONTROL_ITO_MSK |
                                        ALTERA_AVALON_TIMER_CONTROL_CONT_MSK |
                                        ALTERA_AVALON_TIMER_CONTROL_START_MSK);
+
 }
 
 bool isImageCopyDone() {
@@ -96,24 +101,23 @@ void decrypt_wh() {
   u32 local_height = shared_data.image_h;
   u32 local_width = shared_data.image_w;
 
-  height = mod_exp(local_height, d, n);
-  width = mod_exp(local_width, d, n);
+  shared_data.image_h = mod_exp(local_height, d, n);
+  shared_data.image_w = mod_exp(local_width, d, n);
 }
 
-void timer1_100us_isr(void *context) {
-
-  if (decrypt_px_count != (width * height) && isImageCopyDone()) {
+void timer1_10ms_isr(void *context) {
+	  // Limpiar el isr
+  IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER1_10MS_BASE, 0);
+  //printf("\n timer uwu \n");
+  if (decrypt_px_count != (shared_data.image_w * shared_data.image_h) && isImageCopyDone()) {
     unsigned mode = get_mode();
     if (mode == AUTOMATIC_MODE) {
       decrypt_px();
     }
   }
-
-  // Limpiar el isr
-  IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER1_100US_BASE, 0);
 }
 
-void timer0_1ms_isr(void *context) {
+void timer0_10ms_isr(void *context) {
   // si hay más de dos filas descifradas, aplica filtro hasta agotar los pixeles
   // descifrados que se pueden filtrar
   int num_pixels_to_filter = 0;
@@ -151,7 +155,7 @@ void timer0_1ms_isr(void *context) {
     printf("Nios FINISH\n");
     
     // Limpiar el isr
-    IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER0_1MS_BASE, 0);
+    IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER0_10MS_BASE, 0);
   }
 }
 
@@ -255,9 +259,7 @@ int main() {
   alt_ic_isr_register(PIO_SW_IRQ_INTERRUPT_CONTROLLER_ID, PIO_SW_IRQ, sw_isr,
                       NULL, NULL);
 
-  alt_ic_isr_register(TIMER1_100US_IRQ_INTERRUPT_CONTROLLER_ID,
-                      TIMER1_100US_IRQ, timer1_100us_isr, NULL, NULL);
-
+printf("end");
   while (1)
     ;
   return 0;

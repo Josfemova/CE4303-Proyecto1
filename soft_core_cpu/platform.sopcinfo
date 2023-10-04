@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="platform" kind="platform" version="1.0" fabric="QSYS">
  <!-- Format version 20.1 720 (Future versions may contain additional information.) -->
- <!-- 2023.10.03.23:10:50 -->
+ <!-- 2023.10.04.00:22:48 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1696374648</value>
+  <value>1696400567</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -397,9 +397,9 @@ parameters are a RESULT of the module parameters. -->
    </clockDomainMember>
    <clockDomainMember>
     <isBridge>false</isBridge>
-    <moduleName>timer0_1ms</moduleName>
+    <moduleName>timer0_10ms</moduleName>
     <slaveName>clk</slaveName>
-    <name>timer0_1ms.clk</name>
+    <name>timer0_10ms.clk</name>
    </clockDomainMember>
    <clockDomainMember>
     <isBridge>false</isBridge>
@@ -427,9 +427,9 @@ parameters are a RESULT of the module parameters. -->
    </clockDomainMember>
    <clockDomainMember>
     <isBridge>false</isBridge>
-    <moduleName>timer1_100us</moduleName>
+    <moduleName>timer1_10ms</moduleName>
     <slaveName>clk</slaveName>
-    <name>timer1_100us.clk</name>
+    <name>timer1_10ms.clk</name>
    </clockDomainMember>
    <clockDomainMember>
     <isBridge>false</isBridge>
@@ -73282,7 +73282,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="dataSlaveMapParam">
    <type>java.lang.String</type>
-   <value><![CDATA[<address-map><slave name='sdram.s1' start='0x0' end='0x4000000' type='altera_avalon_new_sdram_controller.s1' /><slave name='pio_7seg.s1' start='0x4000000' end='0x4000020' type='altera_avalon_pio.s1' /><slave name='timer1_100us.s1' start='0x4000020' end='0x4000040' type='altera_avalon_timer.s1' /><slave name='timer0_1ms.s1' start='0x4000040' end='0x4000060' type='altera_avalon_timer.s1' /><slave name='pio_sw.s1' start='0x4000060' end='0x4000070' type='altera_avalon_pio.s1' /><slave name='pio_btn.s1' start='0x4000070' end='0x4000080' type='altera_avalon_pio.s1' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0x4000080' end='0x4000088' type='altera_avalon_jtag_uart.avalon_jtag_slave' /><slave name='nios_tec.debug_mem_slave' start='0x4001000' end='0x4001800' type='altera_nios2_gen2.debug_mem_slave' /><slave name='onchip_mem.s1' start='0x4040000' end='0x4060000' type='altera_avalon_onchip_memory2.s1' /></address-map>]]></value>
+   <value><![CDATA[<address-map><slave name='sdram.s1' start='0x0' end='0x4000000' type='altera_avalon_new_sdram_controller.s1' /><slave name='pio_7seg.s1' start='0x4000000' end='0x4000020' type='altera_avalon_pio.s1' /><slave name='timer1_10ms.s1' start='0x4000020' end='0x4000040' type='altera_avalon_timer.s1' /><slave name='timer0_10ms.s1' start='0x4000040' end='0x4000060' type='altera_avalon_timer.s1' /><slave name='pio_sw.s1' start='0x4000060' end='0x4000070' type='altera_avalon_pio.s1' /><slave name='pio_btn.s1' start='0x4000070' end='0x4000080' type='altera_avalon_pio.s1' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0x4000080' end='0x4000088' type='altera_avalon_jtag_uart.avalon_jtag_slave' /><slave name='nios_tec.debug_mem_slave' start='0x4001000' end='0x4001800' type='altera_nios2_gen2.debug_mem_slave' /><slave name='onchip_mem.s1' start='0x4040000' end='0x4060000' type='altera_avalon_onchip_memory2.s1' /></address-map>]]></value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -73974,9 +73974,9 @@ parameters are a RESULT of the module parameters. -->
    </memoryBlock>
    <memoryBlock>
     <isBridge>false</isBridge>
-    <moduleName>timer0_1ms</moduleName>
+    <moduleName>timer0_10ms</moduleName>
     <slaveName>s1</slaveName>
-    <name>timer0_1ms.s1</name>
+    <name>timer0_10ms.s1</name>
     <baseAddress>67108928</baseAddress>
     <span>32</span>
    </memoryBlock>
@@ -74014,9 +74014,9 @@ parameters are a RESULT of the module parameters. -->
    </memoryBlock>
    <memoryBlock>
     <isBridge>false</isBridge>
-    <moduleName>timer1_100us</moduleName>
+    <moduleName>timer1_10ms</moduleName>
     <slaveName>s1</slaveName>
-    <name>timer1_100us.s1</name>
+    <name>timer1_10ms.s1</name>
     <baseAddress>67108896</baseAddress>
     <span>32</span>
    </memoryBlock>
@@ -74409,9 +74409,9 @@ parameters are a RESULT of the module parameters. -->
    </interrupt>
    <interrupt>
     <isBridge>false</isBridge>
-    <moduleName>timer0_1ms</moduleName>
+    <moduleName>timer0_10ms</moduleName>
     <slaveName>irq</slaveName>
-    <name>timer0_1ms.irq</name>
+    <name>timer0_10ms.irq</name>
     <interruptNumber>1</interruptNumber>
    </interrupt>
    <interrupt>
@@ -74430,9 +74430,9 @@ parameters are a RESULT of the module parameters. -->
    </interrupt>
    <interrupt>
     <isBridge>false</isBridge>
-    <moduleName>timer1_100us</moduleName>
+    <moduleName>timer1_10ms</moduleName>
     <slaveName>irq</slaveName>
-    <name>timer1_100us.irq</name>
+    <name>timer1_10ms.irq</name>
     <interruptNumber>4</interruptNumber>
    </interrupt>
   </interface>
@@ -79285,10 +79285,10 @@ parameters are a RESULT of the module parameters. -->
   </interface>
  </module>
  <module
-   name="timer0_1ms"
+   name="timer0_10ms"
    kind="altera_avalon_timer"
    version="20.1"
-   path="timer0_1ms">
+   path="timer0_10ms">
   <!-- Describes a single module. Module parameters are
 the requested settings for a module instance. -->
   <assignment>
@@ -79309,7 +79309,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.LOAD_VALUE</name>
-   <value>99999</value>
+   <value>999999</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.MULT</name>
@@ -79317,7 +79317,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.PERIOD</name>
-   <value>1</value>
+   <value>10</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.PERIOD_UNITS</name>
@@ -79333,7 +79333,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TICKS_PER_SEC</name>
-   <value>1000</value>
+   <value>100</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TIMEOUT_PULSE_OUTPUT</name>
@@ -79369,7 +79369,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="period">
    <type>java.lang.String</type>
-   <value>1</value>
+   <value>10</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -79451,7 +79451,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="loadValue">
    <type>java.lang.String</type>
-   <value>99999</value>
+   <value>999999</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -79467,7 +79467,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="ticksPerSec">
    <type>double</type>
-   <value>1000.0</value>
+   <value>100.0</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -79978,7 +79978,7 @@ particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
    <parameter name="associatedAddressablePoint">
     <type>com.altera.entityinterfaces.IConnectionPoint</type>
-    <value>timer0_1ms.s1</value>
+    <value>timer0_10ms.s1</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>true</visible>
@@ -80051,10 +80051,10 @@ parameters are a RESULT of the module parameters. -->
   </interface>
  </module>
  <module
-   name="timer1_100us"
+   name="timer1_10ms"
    kind="altera_avalon_timer"
    version="20.1"
-   path="timer1_100us">
+   path="timer1_10ms">
   <!-- Describes a single module. Module parameters are
 the requested settings for a module instance. -->
   <assignment>
@@ -80075,19 +80075,19 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.LOAD_VALUE</name>
-   <value>9999</value>
+   <value>999999</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.MULT</name>
-   <value>0.000001</value>
+   <value>0.001</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.PERIOD</name>
-   <value>100</value>
+   <value>10</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.PERIOD_UNITS</name>
-   <value>us</value>
+   <value>ms</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.RESET_OUTPUT</name>
@@ -80099,7 +80099,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TICKS_PER_SEC</name>
-   <value>10000</value>
+   <value>100</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TIMEOUT_PULSE_OUTPUT</name>
@@ -80135,7 +80135,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="period">
    <type>java.lang.String</type>
-   <value>100</value>
+   <value>10</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -80143,7 +80143,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="periodUnits">
    <type>java.lang.String</type>
-   <value>USEC</value>
+   <value>MSEC</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -80201,7 +80201,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="periodUnitsString">
    <type>java.lang.String</type>
-   <value>us</value>
+   <value>ms</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -80209,7 +80209,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="valueInSecond">
    <type>double</type>
-   <value>1.0E-6</value>
+   <value>0.001</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -80217,7 +80217,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="loadValue">
    <type>java.lang.String</type>
-   <value>9999</value>
+   <value>999999</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -80225,7 +80225,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="mult">
    <type>double</type>
-   <value>1.0E-6</value>
+   <value>0.001</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -80233,7 +80233,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="ticksPerSec">
    <type>double</type>
-   <value>10000.0</value>
+   <value>100.0</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -80744,7 +80744,7 @@ particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
    <parameter name="associatedAddressablePoint">
     <type>com.altera.entityinterfaces.IConnectionPoint</type>
-    <value>timer1_100us.s1</value>
+    <value>timer1_10ms.s1</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>true</visible>
@@ -88954,11 +88954,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>s1</endConnectionPoint>
  </connection>
  <connection
-   name="nios_tec.data_master/timer0_1ms.s1"
+   name="nios_tec.data_master/timer0_10ms.s1"
    kind="avalon"
    version="20.1"
    start="nios_tec.data_master"
-   end="timer0_1ms.s1">
+   end="timer0_10ms.s1">
   <parameter name="arbitrationPriority">
    <type>int</type>
    <value>1</value>
@@ -89001,7 +89001,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>nios_tec</startModule>
   <startConnectionPoint>data_master</startConnectionPoint>
-  <endModule>timer0_1ms</endModule>
+  <endModule>timer0_10ms</endModule>
   <endConnectionPoint>s1</endConnectionPoint>
  </connection>
  <connection
@@ -89209,11 +89209,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>s1</endConnectionPoint>
  </connection>
  <connection
-   name="nios_tec.data_master/timer1_100us.s1"
+   name="nios_tec.data_master/timer1_10ms.s1"
    kind="avalon"
    version="20.1"
    start="nios_tec.data_master"
-   end="timer1_100us.s1">
+   end="timer1_10ms.s1">
   <parameter name="arbitrationPriority">
    <type>int</type>
    <value>1</value>
@@ -89256,7 +89256,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>nios_tec</startModule>
   <startConnectionPoint>data_master</startConnectionPoint>
-  <endModule>timer1_100us</endModule>
+  <endModule>timer1_10ms</endModule>
   <endConnectionPoint>s1</endConnectionPoint>
  </connection>
  <connection
@@ -89569,11 +89569,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>clk</endConnectionPoint>
  </connection>
  <connection
-   name="clocks.sys_clk/timer0_1ms.clk"
+   name="clocks.sys_clk/timer0_10ms.clk"
    kind="clock"
    version="20.1"
    start="clocks.sys_clk"
-   end="timer0_1ms.clk">
+   end="timer0_10ms.clk">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -89592,7 +89592,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>clocks</startModule>
   <startConnectionPoint>sys_clk</startConnectionPoint>
-  <endModule>timer0_1ms</endModule>
+  <endModule>timer0_10ms</endModule>
   <endConnectionPoint>clk</endConnectionPoint>
  </connection>
  <connection
@@ -89704,11 +89704,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>clk</endConnectionPoint>
  </connection>
  <connection
-   name="clocks.sys_clk/timer1_100us.clk"
+   name="clocks.sys_clk/timer1_10ms.clk"
    kind="clock"
    version="20.1"
    start="clocks.sys_clk"
-   end="timer1_100us.clk">
+   end="timer1_10ms.clk">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -89727,7 +89727,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>clocks</startModule>
   <startConnectionPoint>sys_clk</startConnectionPoint>
-  <endModule>timer1_100us</endModule>
+  <endModule>timer1_10ms</endModule>
   <endConnectionPoint>clk</endConnectionPoint>
  </connection>
  <connection
@@ -89820,11 +89820,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>irq</endConnectionPoint>
  </connection>
  <connection
-   name="nios_tec.irq/timer0_1ms.irq"
+   name="nios_tec.irq/timer0_10ms.irq"
    kind="interrupt"
    version="20.1"
    start="nios_tec.irq"
-   end="timer0_1ms.irq">
+   end="timer0_10ms.irq">
   <parameter name="irqNumber">
    <type>int</type>
    <value>1</value>
@@ -89851,7 +89851,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>nios_tec</startModule>
   <startConnectionPoint>irq</startConnectionPoint>
-  <endModule>timer0_1ms</endModule>
+  <endModule>timer0_10ms</endModule>
   <endConnectionPoint>irq</endConnectionPoint>
  </connection>
  <connection
@@ -89925,11 +89925,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>irq</endConnectionPoint>
  </connection>
  <connection
-   name="nios_tec.irq/timer1_100us.irq"
+   name="nios_tec.irq/timer1_10ms.irq"
    kind="interrupt"
    version="20.1"
    start="nios_tec.irq"
-   end="timer1_100us.irq">
+   end="timer1_10ms.irq">
   <parameter name="irqNumber">
    <type>int</type>
    <value>4</value>
@@ -89956,7 +89956,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>nios_tec</startModule>
   <startConnectionPoint>irq</startConnectionPoint>
-  <endModule>timer1_100us</endModule>
+  <endModule>timer1_10ms</endModule>
   <endConnectionPoint>irq</endConnectionPoint>
  </connection>
  <connection
@@ -90014,11 +90014,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
-   name="nios_tec.debug_reset_request/timer0_1ms.reset"
+   name="nios_tec.debug_reset_request/timer0_10ms.reset"
    kind="reset"
    version="20.1"
    start="nios_tec.debug_reset_request"
-   end="timer0_1ms.reset">
+   end="timer0_10ms.reset">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -90037,7 +90037,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>nios_tec</startModule>
   <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>timer0_1ms</endModule>
+  <endModule>timer0_10ms</endModule>
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
@@ -90203,11 +90203,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
-   name="clocks.reset_source/timer0_1ms.reset"
+   name="clocks.reset_source/timer0_10ms.reset"
    kind="reset"
    version="20.1"
    start="clocks.reset_source"
-   end="timer0_1ms.reset">
+   end="timer0_10ms.reset">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -90226,7 +90226,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>clocks</startModule>
   <startConnectionPoint>reset_source</startConnectionPoint>
-  <endModule>timer0_1ms</endModule>
+  <endModule>timer0_10ms</endModule>
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
@@ -90338,11 +90338,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
-   name="clocks.reset_source/timer1_100us.reset"
+   name="clocks.reset_source/timer1_10ms.reset"
    kind="reset"
    version="20.1"
    start="clocks.reset_source"
-   end="timer1_100us.reset">
+   end="timer1_10ms.reset">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -90361,7 +90361,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>clocks</startModule>
   <startConnectionPoint>reset_source</startConnectionPoint>
-  <endModule>timer1_100us</endModule>
+  <endModule>timer1_10ms</endModule>
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection

@@ -2,9 +2,9 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Oct 3, 2023 11:52:30 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1696377150741</BspGeneratedUnixTimeStamp>
-        <BspGeneratedLocation>/home/fabian/home/tec/operativos/CE4303-Proyecto1/soft_core_cpu/software/Proyecto1_bsp</BspGeneratedLocation>
+        <BspGeneratedTimeStamp>Oct 4, 2023 12:30:22 AM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1696401022385</BspGeneratedUnixTimeStamp>
+        <BspGeneratedLocation>/home/josfemova/REPOSITORIOS/CE4303-Proyecto1/soft_core_cpu/software/Proyecto1_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>../../platform.sopcinfo</SopcDesignFile>
         <JdiFile>default</JdiFile>
@@ -14,7 +14,7 @@
                 <SettingName>hal.sys_clk_timer</SettingName>
                 <Identifier>ALT_SYS_CLK</Identifier>
                 <Type>UnquotedString</Type>
-                <Value>timer0_1ms</Value>
+                <Value>timer0_10ms</Value>
                 <DefaultValue>none</DefaultValue>
                 <DestinationFile>system_h_define</DestinationFile>
                 <Description>Slave descriptor of the system clock timer device. This device provides a periodic interrupt ("tick") and is typically required for RTOS use. This setting defines the value of ALT_SYS_CLK in system.h.</Description>
@@ -911,13 +911,13 @@
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
-                <slaveDescriptor>timer1_100us</slaveDescriptor>
+                <slaveDescriptor>timer1_10ms</slaveDescriptor>
                 <addressRange>0x04000020 - 0x0400003F</addressRange>
                 <addressSpan>32</addressSpan>
                 <attributes>timer</attributes>
         </MemoryMap>
         <MemoryMap>
-                <slaveDescriptor>timer0_1ms</slaveDescriptor>
+                <slaveDescriptor>timer0_10ms</slaveDescriptor>
                 <addressRange>0x04000040 - 0x0400005F</addressRange>
                 <addressSpan>32</addressSpan>
                 <attributes>timer</attributes>
