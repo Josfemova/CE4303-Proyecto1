@@ -23,25 +23,25 @@ char *output_file_filtered;
 void *timer_thread();
 
 void save_image(uint8_t *memory_start, const char *file_name) {
-    FILE *pFile;
-    pFile = fopen(file_name, "wb");
+  FILE *pFile;
+  pFile = fopen(file_name, "wb");
 
-    if (pFile == NULL) {
-        printf("Failed to open file.\n");
-        return;
-    }
+  if (pFile == NULL) {
+    printf("Failed to open file.\n");
+    return;
+  }
 
-    // Obtener tamaño de imagen con width*height
-    size_t size = shared_data->image_h * shared_data->image_w;
+  // Obtener tamaño de imagen con width*height
+  size_t size = shared_data->image_h * shared_data->image_w;
 
-    fwrite(memory_start, size, 1, pFile);
+  fwrite(memory_start, size, 1, pFile);
 
-    fclose(pFile);
+  fclose(pFile);
 }
 
 int main(int argc, char *argv[]) {
   printf("Todo esta bien\r\n");
-  
+
   // rutas de archivo
   char *input_file = argv[1];
   output_file_decrypted = argv[2];
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
   volatile u32 *virtual_7seg_pio = (u32 *)map_result;
   // Leer valor del puntero de los datos compartidos
   off_t shared_data_base = HPS2FPGA_BRIDGE_BASE + (*virtual_7seg_pio);
-  printf("shared data lives at 0x%lx\r\n", (unsigned long) shared_data_base);
+  printf("shared data lives at 0x%lx\r\n", (unsigned long)shared_data_base);
   // mapear datos compartidos en memoria virtual
   map_result = mmap(NULL, sizeof(shared_data_t), (PROT_READ | PROT_WRITE),
                     MAP_SHARED, fd, shared_data_base);
@@ -98,23 +98,22 @@ int main(int argc, char *argv[]) {
   while (1) {
     // Attempt to read an integer
     result = fscanf(file, "%d,", &num);
-    //printf("num %d", num);
+    // printf("num %d", num);
     if (result == EOF) {
-      break; // End of file
+      break;  // End of file
     } else if (result == 1) {
-
       if (count == 0) {
-        shared_data->image_w = (u32) num;
+        shared_data->image_w = (u32)num;
         count++;
         continue;
       }
       if (count == 1) {
-        shared_data->image_h = (u32) num;
+        shared_data->image_h = (u32)num;
         count++;
-	continue;
+        continue;
       }
 
-      shared_data->image_encrypted[count - 2] = (u32) num;
+      shared_data->image_encrypted[count - 2] = (u32)num;
       count++;
     } else {
       // Incomplete or invalid input, read and discard the rest of the line
@@ -153,31 +152,23 @@ int main(int argc, char *argv[]) {
 
 void proceso_periodico() {
   printf("proceso periodico %d\n", shared_data->decrypt_done);
- if(shared_data->decrypt_done == 1){
-    uint8_t *compacted_decrypted = (uint8_t *)&shared_data->image_encrypted[0];
-    for (size_t i = 0; i < 100; i++) {
-      compacted_decrypted[i] = (uint8_t)shared_data->image_encrypted[i];
-    }
 
-    //guardar imagen descifrada
-    save_image(compacted_decrypted, output_file_decrypted);
-    printf("se guarda"); 
-    pthread_exit(0);	
- }
-
-  if (shared_data->decrypt_done && shared_data->nios_filter_done && shared_data->hps_filter_done) {
-    
+  if (shared_data->decrypt_done && shared_data->nios_filter_done &&
+      shared_data->hps_filter_done) {
     // compactar imagen
     uint8_t *compacted_decrypted = (uint8_t *)&shared_data->image_encrypted[0];
-    for (size_t i = 0; i < shared_data->image_w * shared_data->image_h; i++) {
+    for (size_t i = 0; i < (shared_data->image_w * shared_data->image_h); i++) {
       compacted_decrypted[i] = (uint8_t)shared_data->image_encrypted[i];
     }
 
-    //guardar imagen descifrada
+    // guardar imagen descifrada
     save_image(compacted_decrypted, output_file_decrypted);
+    printf("se guarda descifrada\n");
 
-    //guardar imagen filtrada
-    save_image((uint8_t *)&shared_data->image_filtered[0], output_file_filtered);
+    // guardar imagen filtrada
+    save_image((uint8_t *)&shared_data->image_filtered[0],
+               output_file_filtered);
+    printf("se guarda filtrada\n");
 
     // Apagar thread
     pthread_exit(0);
@@ -230,12 +221,12 @@ void proceso_periodico() {
 }
 
 void *timer_thread(void) {
-  printf("se ejecuta \n");	  
+  printf("se ejecuta \n");
   while (1) {
-    sleep(0.001); //1ms
+    sleep(0.001);  // 1ms
     proceso_periodico();
     printf("se ejecuta \n");
   }
- printf("sale \n");
+  printf("sale \n");
   return 0;
 }

@@ -33,6 +33,7 @@ unsigned static current_7_seg = 0;
 unsigned static has_started = 0;
 void timer1_10ms_isr(void *context);
 void timer0_10ms_isr(void *context);
+void decrypt_wh();
 
 unsigned get_mode() {
   unsigned pio_sw = IORD_ALTERA_AVALON_PIO_DATA(PIO_SW_BASE);
@@ -107,9 +108,9 @@ void decrypt_wh() {
          shared_data.image_h);
 
   // Calcular pixel para filtro
+  // filter_start_
   shared_data.filter_hps_start =
-      (u32)((shared_data.image_h * shared_data.image_w) *
-            (shared_data.filter_hps_start / 100));
+      (u32)((shared_data.image_h * shared_data.image_w * shared_data.filter_hps_start) / 100);
   printf("keys: d: 0x%x n: 0x%x\n", d, n);
   printf("hps empieza a descifrar en pixel 0x%x\n", shared_data.filter_hps_start);
 }
