@@ -3,8 +3,8 @@
 #include <math.h>
 #include <stdbool.h>
 
-static float filter[9] = {
-    0.25, 0.5, 0.25, 0.5, -3, 0.5, 0.25, 0.5, 0.25,
+static uint32_t filter[9] = {
+    0, 1, 0, 1, -4, 1, 0, 1, 0,
 };
 
 uint8_t filter_pixel(uint32_t *image, size_t idx, size_t image_w,
@@ -17,53 +17,53 @@ uint8_t filter_pixel(uint32_t *image, size_t idx, size_t image_w,
   bool top_border = (y == 0);
   bool bottom_border = (y == image_h - 1);
 
-  static float pixels[9] = {0};
+  static uint32_t pixels[9] = {0};
 
   if (top_border) {
     // x 0 0
     // 0 0 0
     // 0 0 0
     if (left_border) {
-      pixels[0] = (float)image[idx];
+      pixels[0] = image[idx];
     } else {
-      pixels[0] = (float)image[idx - 1];
+      pixels[0] = image[idx - 1];
     }
 
     // 0 x 0
     // 0 0 0
     // 0 0 0
-    pixels[1] = (float)image[idx];
+    pixels[1] = image[idx];
 
     // 0 0 x
     // 0 0 0
     // 0 0 0
     if (right_border) {
-      pixels[2] = (float)image[idx];
+      pixels[2] = image[idx];
     } else {
-      pixels[2] = (float)image[idx + 1];
+      pixels[2] = image[idx + 1];
     }
   } else {
     // x 0 0
     // 0 0 0
     // 0 0 0
     if (left_border) {
-      pixels[0] = (float)image[idx - image_w];
+      pixels[0] = image[idx - image_w];
     } else {
-      pixels[0] = (float)image[idx - image_w - 1];
+      pixels[0] = image[idx - image_w - 1];
     }
 
     // 0 x 0
     // 0 0 0
     // 0 0 0
-    pixels[1] = (float)image[idx - image_w];
+    pixels[1] = image[idx - image_w];
 
     // 0 0 x
     // 0 0 0
     // 0 0 0
     if (right_border) {
-      pixels[2] = (float)image[idx - image_w];
+      pixels[2] = image[idx - image_w];
     } else {
-      pixels[2] = (float)image[idx - image_w + 1];
+      pixels[2] = image[idx - image_w + 1];
     }
   }
 
@@ -71,23 +71,23 @@ uint8_t filter_pixel(uint32_t *image, size_t idx, size_t image_w,
   // x 0 0
   // 0 0 0
   if (left_border) {
-    pixels[3] = (float)image[idx];
+    pixels[3] = image[idx];
   } else {
-    pixels[3] = (float)image[idx - 1];
+    pixels[3] = image[idx - 1];
   }
 
   // 0 0 0
   // 0 x 0
   // 0 0 0
-  pixels[4] = (float)image[idx];
+  pixels[4] = image[idx];
 
   // 0 0 0
   // 0 0 x
   // 0 0 0
   if (right_border) {
-    pixels[5] = (float)image[idx];
+    pixels[5] = image[idx];
   } else {
-    pixels[5] = (float)image[idx + 1];
+    pixels[5] = image[idx + 1];
   }
 
   if (bottom_border) {
@@ -95,55 +95,55 @@ uint8_t filter_pixel(uint32_t *image, size_t idx, size_t image_w,
     // 0 0 0
     // x 0 0
     if (left_border) {
-      pixels[6] = (float)image[idx];
+      pixels[6] = image[idx];
     } else {
-      pixels[6] = (float)image[idx - 1];
+      pixels[6] = image[idx - 1];
     }
 
     // 0 0 0
     // 0 0 0
     // 0 x 0
-    pixels[7] = (float)image[idx];
+    pixels[7] = image[idx];
 
     // 0 0 0
     // 0 0 0
     // 0 0 x
     if (right_border) {
-      pixels[8] = (float)image[idx];
+      pixels[8] = image[idx];
     } else {
-      pixels[8] = (float)image[idx + 1];
+      pixels[8] = image[idx + 1];
     }
   } else {
     // 0 0 0
     // 0 0 0
     // x 0 0
     if (left_border) {
-      pixels[6] = (float)image[idx + image_w];
+      pixels[6] = image[idx + image_w];
     } else {
-      pixels[6] = (float)image[idx + image_w - 1];
+      pixels[6] = image[idx + image_w - 1];
     }
 
     // 0 0 0
     // 0 0 0
     // 0 x 0
-    pixels[7] = (float)image[idx + image_w];
+    pixels[7] = image[idx + image_w];
 
     // 0 0 0
     // 0 0 0
     // 0 0 x
     if (right_border) {
-      pixels[8] = (float)image[idx + image_w];
+      pixels[8] = image[idx + image_w];
     } else {
-      pixels[8] = (float)image[idx + image_w + 1];
+      pixels[8] = image[idx + image_w + 1];
     }
   }
 
-  float result = 0;
+  uint32_t result = 0;
   for (size_t i = 0; i < 9; i++) {
     result += pixels[i] * filter[i];
   }
 
-  return (uint8_t)round(result);
+  return (uint8_t)result;
 }
 
 void apply_filter(uint32_t *image, uint8_t *out_buf, size_t start_idx,

@@ -1,4 +1,5 @@
 CC=armv7l-unknown-linux-musleabihf-gcc
+#CC=arm-none-linux-gnueabihf-gcc
 CFLAGS=-g -I$(IDIR) -Wall -Wextra -Werror -static
 
 IDIR=include

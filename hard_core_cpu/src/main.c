@@ -6,13 +6,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "filter.h"
 #include "misc.h"
 #include "types.h"
 
+time_t seconds;
 volatile shared_data_t *shared_data;
+volatile u32 *virtual_7seg_pio;
 static unsigned filter_px_count = 0;
 
 //// se copio bien
@@ -40,6 +43,7 @@ void save_image(uint8_t *memory_start, const char *file_name) {
 }
 
 int main(int argc, char *argv[]) {
+  seconds = time(NULL);
   printf("Todo esta bien\r\n");
 
   // rutas de archivo
@@ -64,7 +68,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  volatile u32 *virtual_7seg_pio = (u32 *)map_result;
+  virtual_7seg_pio = (u32 *)map_result;
   // Leer valor del puntero de los datos compartidos
   off_t shared_data_base = HPS2FPGA_BRIDGE_BASE + (*virtual_7seg_pio);
   printf("shared data lives at 0x%lx\r\n", (unsigned long)shared_data_base);
@@ -170,12 +174,17 @@ void proceso_periodico() {
                output_file_filtered);
     printf("se guarda filtrada\n");
 
+    // colocar valor de segundos en 7 segmentos
+    time_t delta = time(NULL) - seconds;
+    *virtual_7seg_pio = delta;
+    printf("Procesamiento se tomo 0x%lx \n", delta);
     // Apagar thread
     pthread_exit(0);
   }
 
   // hay pixeles pa procesar por parte del HPS?
-  if (shared_data->decrypt_px_count < shared_data->filter_hps_start) {
+  //! if (shared_data->decrypt_px_count < shared_data->filter_hps_start) {
+  if (!shared_data->decrypt_done) {
     return;
   }
   // si sí, procesa lo que hay

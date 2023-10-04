@@ -110,7 +110,8 @@ void decrypt_wh() {
   // Calcular pixel para filtro
   // filter_start_
   shared_data.filter_hps_start =
-      (u32)((shared_data.image_h * shared_data.image_w * shared_data.filter_hps_start) / 100);
+      (u32)(((shared_data.image_h* shared_data.filter_hps_start) / 100) * shared_data.image_w);
+
   printf("keys: d: 0x%x n: 0x%x\n", d, n);
   printf("hps empieza a descifrar en pixel 0x%x\n", shared_data.filter_hps_start);
 }
@@ -159,7 +160,7 @@ void timer0_10ms_isr(void *context) {
 
   // Esperar a que hayan 2 filas o esté desencriptado hasta el final
   // (donde final = donde empieza cortex)
-  if ((unfiltered_decrypted_px_count > 2 * shared_data.image_w) ||
+  if ((unfiltered_decrypted_px_count > 4 * shared_data.image_w) ||
       (unfiltered_decrypted_px_count ==
        shared_data.filter_hps_start - filter_px_count)) {
     num_pixels_to_filter = unfiltered_decrypted_px_count;
