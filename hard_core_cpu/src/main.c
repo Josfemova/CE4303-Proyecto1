@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     result = fscanf(file, "%d,", &num);
     // printf("num %d", num);
     if (result == EOF) {
-      break;  // End of file
+      break; // End of file
     } else if (result == 1) {
       if (count == 0) {
         shared_data->image_w = (u32)num;
@@ -203,9 +203,19 @@ void proceso_periodico() {
   }
 
   // Esperar a que hayan 2 filas o esté desencriptado hasta el final
-  if ((unsigned)unfiltered_decrypted_px_count > 2 * shared_data->image_w ||
+  if ((unsigned)unfiltered_decrypted_px_count > 5 * shared_data->image_w ||
       shared_data->decrypt_done) {
     num_pixels_to_filter = unfiltered_decrypted_px_count;
+  }
+
+  // Dar un buffer de dos filas que no toque hasta el final
+  if (!shared_data->decrypt_done) {
+    num_pixels_to_filter -= 2 * shared_data->image_w;
+  }
+
+  // Truncar a 0 (puede ser negativo)
+  if (num_pixels_to_filter < 0) {
+    num_pixels_to_filter = 0;
   }
 
   apply_filter((uint32_t *)&shared_data->image_encrypted[0],
@@ -232,7 +242,7 @@ void proceso_periodico() {
 void *timer_thread(void) {
   printf("se ejecuta \n");
   while (1) {
-    sleep(0.001);  // 1ms
+    sleep(0.001); // 1ms
     proceso_periodico();
     printf("se ejecuta \n");
   }
