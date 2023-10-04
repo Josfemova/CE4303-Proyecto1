@@ -247,7 +247,7 @@ int main() {
 
   //Calcular pixel para filtro
   shared_data.filter_hps_start = (u32) ((shared_data.image_h * shared_data.image_w) * (shared_data.filter_hps_start/100));
-
+  
 
   alt_ic_isr_register(PIO_BTN_IRQ_INTERRUPT_CONTROLLER_ID, PIO_BTN_IRQ, btn_isr,
                       NULL, NULL);

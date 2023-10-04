@@ -118,7 +118,6 @@ int main(int argc, char *argv[]) {
   }
 
   fclose(file);
-  return 0;
 
   // setea image_copy_done
   shared_data->image_copy_done = 1;
